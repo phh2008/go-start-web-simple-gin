@@ -28,14 +28,14 @@ func (a *RoleDao) Add(ctx context.Context, entity entity.RoleEntity) (entity.Rol
 	if role.Id > 0 {
 		return entity, exception.NewBizError("500", "角色已存在")
 	}
-	db := a.Db
+	db := a.Db.WithContext(ctx)
 	db = db.Create(&entity)
 	return entity, db.Error
 }
 
 // GetByCode 根据角色编号获取角色
 func (a *RoleDao) GetByCode(ctx context.Context, code string) entity.RoleEntity {
-	db := a.Db
+	db := a.Db.WithContext(ctx)
 	var role entity.RoleEntity
 	db.Where("role_code=?", code).First(&role)
 	return role

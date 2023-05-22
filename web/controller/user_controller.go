@@ -7,6 +7,7 @@ import (
 	"com.gientech/selection/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+	"strconv"
 )
 
 var UserSet = wire.NewSet(wire.Struct(new(UserController), "*"))
@@ -44,4 +45,15 @@ func (a *UserController) AssignRole(ctx *gin.Context) {
 		return
 	}
 	a.UserService.AssignRole(ctx, userRole).Response(ctx)
+}
+
+// DeleteById 刪除用戶
+func (a *UserController) DeleteById(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		result.Failure[any]("参数错误").Response(ctx)
+		return
+	}
+	a.UserService.DeleteById(ctx, id).Response(ctx)
 }

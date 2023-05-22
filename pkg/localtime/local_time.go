@@ -18,7 +18,7 @@ func (t *LocalTime) MarshalJSON() ([]byte, error) {
 }
 
 // Value 实现 Value 方法，写入数据库时会调用该方法将自定义时间类型转换并写入数据库；
-func (t *LocalTime) Value() (driver.Value, error) {
+func (t LocalTime) Value() (driver.Value, error) {
 	var zeroTime time.Time
 	if t.Time.UnixNano() == zeroTime.UnixNano() {
 		return nil, nil

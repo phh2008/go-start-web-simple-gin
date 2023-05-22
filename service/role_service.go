@@ -56,13 +56,13 @@ func (a *RoleService) AssignPermission(ctx context.Context, assign model.RoleAss
 		permissions = append(permissions, []string{roleIdString, v.Url, v.Action})
 	}
 	// 删除原来的角色与权限关系
-	err := a.RolePermissionDao.DeleteByRoleId(assign.RoleId)
+	err := a.RolePermissionDao.DeleteByRoleId(ctx, assign.RoleId)
 	if err != nil {
 		logger.Errorf("删除操作失败，%s", err.Error())
 		return result.Fail[any]()
 	}
 	// 新增角色与权限关系
-	a.RolePermissionDao.BatchAdd(rolePermList)
+	a.RolePermissionDao.BatchAdd(ctx, rolePermList)
 	// 更新casbin中的角色与资源关系
 	a.Enforcer.DeletePermissionsForUser(role.RoleCode)
 	if len(permissions) > 0 {

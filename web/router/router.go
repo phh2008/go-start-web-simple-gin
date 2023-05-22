@@ -36,8 +36,9 @@ func (a *Router) Register() {
 	{
 		//用户API
 		v1.POST("/user/login", a.UserApi.Login)
-		v1.POST("/user/createByEmail", a.UserApi.CreateByEmail)
+		v1.POST("/user/createByEmail", a.Auth.Authenticate(), a.UserApi.CreateByEmail)
 		v1.POST("/user/assignRole", a.UserApi.AssignRole)
+		v1.DELETE("/user/delete/:id", a.Auth.Authenticate(), a.UserApi.DeleteById)
 		//角色API
 		v1.POST("/role/add", a.RoleApi.Add)
 		v1.POST("/role/assignPermission", a.RoleApi.AssignPermission)

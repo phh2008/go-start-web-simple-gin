@@ -14,7 +14,7 @@ type PermissionDao struct {
 }
 
 func (a *PermissionDao) Add(ctx context.Context, permission entity.PermissionEntity) (entity.PermissionEntity, error) {
-	db := a.Db
+	db := a.Db.WithContext(ctx)
 	db = db.Create(&permission)
 	return permission, db.Error
 }

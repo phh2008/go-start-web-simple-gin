@@ -2,6 +2,7 @@ package dao
 
 import (
 	"com.gientech/selection/entity"
+	"context"
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -12,17 +13,17 @@ type RolePermissionDao struct {
 	Db *gorm.DB
 }
 
-func (a *RolePermissionDao) DeleteByRoleId(roleId int64) error {
-	db := a.Db
+func (a *RolePermissionDao) DeleteByRoleId(ctx context.Context, roleId int64) error {
+	db := a.Db.WithContext(ctx)
 	db = db.Where("role_id=?", roleId).Delete(&entity.RolePermissionEntity{})
 	return db.Error
 }
 
-func (a *RolePermissionDao) BatchAdd(list []*entity.RolePermissionEntity) error {
+func (a *RolePermissionDao) BatchAdd(ctx context.Context, list []*entity.RolePermissionEntity) error {
 	if len(list) == 0 {
 		return nil
 	}
-	db := a.Db
+	db := a.Db.WithContext(ctx)
 	db = db.Create(list)
 	return db.Error
 }

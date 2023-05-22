@@ -81,12 +81,21 @@ func (a *UserService) LoginByEmail(ctx context.Context, loginModel model.UserLog
 func (a *UserService) AssignRole(ctx context.Context, userRole model.AssignRoleModel) *result.Result[any] {
 	err := a.UserDao.SetRole(ctx, userRole.UserId, userRole.RoleCode)
 	if err != nil {
-		logger.Errorf("db update error", err.Error())
+		logger.Errorf("db update error: %s", err.Error())
 		return result.Failure[any]("分配角色出错")
 	}
 	// 更新casbin中的用户与角色关系
 	uid := strconv.FormatInt(userRole.UserId, 10)
 	_, _ = a.Enforcer.DeleteRolesForUser(uid)
 	_, _ = a.Enforcer.AddGroupingPolicy(uid, userRole.RoleCode)
+	return result.Success[any]()
+}
+
+func (a *UserService) DeleteById(ctx context.Context, id int64) *result.Result[any] {
+	err := a.UserDao.DeleteById(ctx, id)
+	if err != nil {
+		logger.Errorf("delete error: %s", err.Error())
+		return result.Failure[any]("刪除出错")
+	}
 	return result.Success[any]()
 }
