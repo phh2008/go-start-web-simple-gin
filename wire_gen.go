@@ -46,11 +46,50 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 		Jwt:      jwtHelper,
 		Enforcer: enforcer,
 	}
+	userDao := &dao.UserDao{
+		Db: db,
+	}
+	userService := &service.UserService{
+		UserDao:  userDao,
+		Jwt:      jwtHelper,
+		Enforcer: enforcer,
+	}
+	userController := &controller.UserController{
+		UserService: userService,
+	}
+	permissionDao := &dao.PermissionDao{
+		Db: db,
+	}
+	permissionService := &service.PermissionService{
+		PermissionDao: permissionDao,
+	}
+	permissionController := &controller.PermissionController{
+		PermissionService: permissionService,
+	}
+	roleDao := &dao.RoleDao{
+		Db: db,
+	}
+	rolePermissionDao := &dao.RolePermissionDao{
+		Db: db,
+	}
+	roleService := &service.RoleService{
+		RoleDao:           roleDao,
+		RolePermissionDao: rolePermissionDao,
+		PermissionDao:     permissionDao,
+		Enforcer:          enforcer,
+	}
+	roleController := &controller.RoleController{
+		RoleService: roleService,
+		UserService: userService,
+	}
 	routerRouter := &router.Router{
-		Engine:   engine,
-		HelloApi: helloController,
-		TestApi:  testController,
-		Auth:     auth,
+		Engine:        engine,
+		HelloApi:      helloController,
+		TestApi:       testController,
+		Auth:          auth,
+		UserApi:       userController,
+		PermissionApi: permissionController,
+		RoleApi:       roleController,
 	}
 	server := &app.Server{
 		Config: configConfig,

@@ -5,7 +5,7 @@ jwt:
   key: abc123
 # 数据库配置
 db:
-  url: root:root@tcp(127.0.0.1:3306)/studio_monitor?charset=utf8mb4&parseTime=True&loc=Local
+  url: root:root@tcp(127.0.0.1:3306)/selection?charset=utf8mb4&parseTime=True&loc=Local
 # 日志配置
 log:
   level: debug

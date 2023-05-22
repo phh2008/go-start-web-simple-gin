@@ -6,7 +6,6 @@ import (
 	"com.gientech/selection/pkg/exception"
 	"com.gientech/selection/pkg/logger"
 	"com.gientech/selection/pkg/xjwt"
-	"context"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
@@ -41,7 +40,6 @@ func (a *Auth) authValid(ctx *gin.Context) (xjwt.UserClaims, bool) {
 		return user, false
 	}
 	ctx.Set(common.UserKey, user)
-	ctx.Request.WithContext(context.WithValue(context.Background(), common.UserKey, user))
 	return user, true
 }
 

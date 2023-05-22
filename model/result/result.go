@@ -27,8 +27,8 @@ func Ok[T any](data T) *Result[T] {
 }
 
 func Fail[T any]() *Result[T] {
-	var zero T
-	return &Result[T]{Code: fail, Message: "system error", TimeStamp: time.Now().UnixMilli(), Data: zero}
+	//var zero T
+	return Error[T](exception.SysError)
 }
 
 func Failure[T any](msg string) *Result[T] {

@@ -1,8 +1,13 @@
 package controller
 
-import "github.com/google/wire"
+import (
+	"github.com/google/wire"
+)
 
 var ControllerSet = wire.NewSet(
 	HelloSet,
 	TestSet,
+	PermissionSet,
+	RoleSet,
+	UserSet,
 )
