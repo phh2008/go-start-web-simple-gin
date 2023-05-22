@@ -1,4 +1,3 @@
-## 评选官网项目
 ## 开发事项
 1.本项目使用了 wire 依赖注入框架，请先安装wire，并添加 gopath/bin到环境变量  
 `go install github.com/google/wire/cmd/wire@latest`
