@@ -1,0 +1,91 @@
+package middleware
+
+import (
+	"com.gientech/selection/model/result"
+	"com.gientech/selection/pkg/common"
+	"com.gientech/selection/pkg/exception"
+	"com.gientech/selection/pkg/logger"
+	"com.gientech/selection/pkg/xjwt"
+	"context"
+	"github.com/casbin/casbin/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
+	"time"
+)
+
+var AuthSet = wire.NewSet(wire.Struct(new(Auth), "*"))
+
+type Auth struct {
+	Jwt      *xjwt.JwtHelper
+	Enforcer *casbin.Enforcer
+}
+
+func (a *Auth) authValid(ctx *gin.Context) (xjwt.UserClaims, bool) {
+	var user xjwt.UserClaims
+	token := ctx.GetHeader(common.AuthTokenKey)
+	if token == "" {
+		result.Error[any](exception.NoLogin).Response(ctx)
+		ctx.Abort()
+		return user, false
+	}
+	jwtToken, err := a.Jwt.VerifyToken(token)
+	if err != nil {
+		result.Error[any](exception.NoLogin).Response(ctx)
+		ctx.Abort()
+		return user, false
+	}
+	user, err = a.Jwt.ParseToken(jwtToken)
+	if !user.IsValidExpiresAt(time.Now()) {
+		result.Error[any](exception.NoLogin).Response(ctx)
+		ctx.Abort()
+		return user, false
+	}
+	ctx.Set(common.UserKey, user)
+	ctx.Request.WithContext(context.WithValue(context.Background(), common.UserKey, user))
+	return user, true
+}
+
+// Authenticate 认证校验
+func (a *Auth) Authenticate() gin.HandlerFunc {
+	auth := func(ctx *gin.Context) {
+		if _, ok := a.authValid(ctx); !ok {
+			return
+		}
+		ctx.Next()
+	}
+	return auth
+}
+
+// Authorization 授权校验
+func (a *Auth) Authorization(action string) gin.HandlerFunc {
+	authorize := func(ctx *gin.Context) {
+		// 是否已登录
+		user, ok := a.authValid(ctx)
+		if !ok {
+			return
+		}
+		// 是否有权限
+		role := user.Role // 当前用户角色
+		obj := ctx.Request.URL.Path
+		act := action
+		if act == "" {
+			act = ctx.Request.Method
+		}
+		ok, err := a.Enforcer.Enforce(role, obj, act)
+		if err != nil {
+			logger.Errorf("Enforcer.Enforce error:%s", err.Error())
+			// 鉴权出错了
+			result.Error[any](exception.SysError).Response(ctx)
+			ctx.Abort()
+			return
+		}
+		if !ok {
+			// 无权限
+			result.Error[any](exception.Unauthorized).Response(ctx)
+			ctx.Abort()
+			return
+		}
+		ctx.Next()
+	}
+	return authorize
+}
