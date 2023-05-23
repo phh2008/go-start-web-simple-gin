@@ -12,10 +12,10 @@ const success = "200"
 const fail = "500"
 
 type Result[T any] struct {
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	TimeStamp int64  `json:"timeStamp"`
-	Data      T      `json:"data"`
+	Code      string `json:"code"`      // 响应码，200表示成功，其它为失败
+	Message   string `json:"message"`   // 错误信息
+	TimeStamp int64  `json:"timeStamp"` // 时间戳
+	Data      T      `json:"data"`      // 响应数据
 }
 
 func Success[T any]() *Result[T] {

@@ -16,6 +16,16 @@ type PermissionController struct {
 }
 
 // List 权限管理列表
+//
+//	@Summary		权限管理列表
+//	@Description	权限管理列表
+//	@Tags			权限
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			perm	query		model.PermissionListReq	false	"查询条件"
+//	@Success		200		{object}	result.Result[model.PageData[model.PermissionModel]]
+//	@Router			/permission/list [get]
 func (a *PermissionController) List(ctx *gin.Context) {
 	var req model.PermissionListReq
 	if ok, err := xgin.ShouldBindQuery(ctx, &req); !ok {
@@ -26,6 +36,16 @@ func (a *PermissionController) List(ctx *gin.Context) {
 }
 
 // AddPermission 添加权限
+//
+//	@Summary		添加权限
+//	@Description	添加权限
+//	@Tags			权限
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			perm	body		model.PermissionModel	true	"权限信息"
+//	@Success		200		{object}	result.Result[entity.PermissionEntity]
+//	@Router			/permission/add [post]
 func (a *PermissionController) AddPermission(ctx *gin.Context) {
 	var perm model.PermissionModel
 	if ok, err := xgin.ShouldBindJSON(ctx, &perm); !ok {

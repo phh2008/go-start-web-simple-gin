@@ -1,8 +1,8 @@
 package model
 
 type QueryPage struct {
-	PageNo   int `json:"pageNo" form:"pageNo"`
-	PageSize int `json:"pageSize" form:"pageSize"`
+	PageNo   int `json:"pageNo" form:"pageNo"`     // 当前页码
+	PageSize int `json:"pageSize" form:"pageSize"` // 每页数量
 }
 
 func NewQueryPage(pageNo int, pageSize int) *QueryPage {

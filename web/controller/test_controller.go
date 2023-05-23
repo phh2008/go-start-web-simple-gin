@@ -45,7 +45,7 @@ func (a *TestController) Auth(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			query	query		model.TestQuery	false	"查询条件"
-//	@Success		200		{object}	result.Result[model.PageData]{data=model.PageData{data=[]model.TestResult}}
+//	@Success		200		{object}	result.Result[model.PageData[model.TestResult]]
 //	@Router			/test/query [get]
 func (a *TestController) Query(ctx *gin.Context) {
 	var testQuery model.TestQuery
