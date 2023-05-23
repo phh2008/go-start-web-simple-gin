@@ -16,6 +16,16 @@ type UserController struct {
 	UserService *service.UserService
 }
 
+// List 用户管理列表
+func (a *UserController) List(ctx *gin.Context) {
+	var req model.UserListReq
+	if ok, err := xgin.ShouldBindQuery(ctx, &req); !ok {
+		result.Error[any](err).Response(ctx)
+		return
+	}
+	a.UserService.ListPage(ctx, req).Response(ctx)
+}
+
 // CreateByEmail 创建用户
 func (a *UserController) CreateByEmail(ctx *gin.Context) {
 	var email model.UserEmailRegister

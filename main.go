@@ -10,7 +10,9 @@ import (
 //	@description				This is a sample server celler server.
 //	@host						localhost:8089
 //	@BasePath					/api/v1
-//	@securityDefinitions.basic	BasicAuth
+//	@securityDefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						Authorization
 func main() {
 	// 参数
 	var configFolder string

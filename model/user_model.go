@@ -18,6 +18,13 @@ type UserModel struct {
 	Deleted  uint8               `json:"deleted"`  // 是否删除 1-否，2-是
 }
 
+type UserListReq struct {
+	QueryPage
+	RealName string `json:"realName" form:"realName"` // 姓名
+	Email    string `json:"email" form:"email"`
+	Status   int    `json:"status" form:"status"` //状态: 1-启用，2-禁用
+}
+
 type UserEmailRegister struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`

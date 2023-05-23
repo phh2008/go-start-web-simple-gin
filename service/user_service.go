@@ -26,6 +26,11 @@ type UserService struct {
 	Enforcer *casbin.Enforcer
 }
 
+func (a *UserService) ListPage(ctx context.Context, req model.UserListReq) *result.Result[model.PageData[model.UserModel]] {
+	data := a.UserDao.ListPage(ctx, req)
+	return result.Ok[model.PageData[model.UserModel]](data)
+}
+
 func (a *UserService) CreateByEmail(ctx context.Context, email model.UserEmailRegister) *result.Result[model.UserModel] {
 	user := a.UserDao.GetByEmail(ctx, email.Email)
 	if user.Id > 0 {
@@ -87,7 +92,10 @@ func (a *UserService) AssignRole(ctx context.Context, userRole model.AssignRoleM
 	// 更新casbin中的用户与角色关系
 	uid := strconv.FormatInt(userRole.UserId, 10)
 	_, _ = a.Enforcer.DeleteRolesForUser(uid)
-	_, _ = a.Enforcer.AddGroupingPolicy(uid, userRole.RoleCode)
+	// 角色为空，表示清除此用户的角色,无需添加
+	if userRole.RoleCode != "" {
+		_, _ = a.Enforcer.AddGroupingPolicy(uid, userRole.RoleCode)
+	}
 	return result.Success[any]()
 }
 
@@ -96,6 +104,11 @@ func (a *UserService) DeleteById(ctx context.Context, id int64) *result.Result[a
 	if err != nil {
 		logger.Errorf("delete error: %s", err.Error())
 		return result.Failure[any]("刪除出错")
+	}
+	// 清除 casbin 中用户信息
+	_, err = a.Enforcer.DeleteRolesForUser(strconv.FormatInt(id, 10))
+	if err != nil {
+		logger.Errorf("Enforcer.DeleteRolesForUser error: %s", err)
 	}
 	return result.Success[any]()
 }

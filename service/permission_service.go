@@ -17,6 +17,11 @@ type PermissionService struct {
 	PermissionDao *dao.PermissionDao
 }
 
+func (a *PermissionService) ListPage(ctx context.Context, req model.PermissionListReq) *result.Result[model.PageData[model.PermissionModel]] {
+	data := a.PermissionDao.ListPage(ctx, req)
+	return result.Ok[model.PageData[model.PermissionModel]](data)
+}
+
 func (a *PermissionService) Add(ctx context.Context, perm model.PermissionModel) *result.Result[entity.PermissionEntity] {
 	var permission entity.PermissionEntity
 	copier.Copy(&permission, &perm)

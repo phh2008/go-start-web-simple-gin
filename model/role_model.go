@@ -14,6 +14,12 @@ type RoleModel struct {
 	UpdateBy int64     `json:"updateBy"` // 更新人
 }
 
+type RoleListReq struct {
+	QueryPage
+	RoleCode string `json:"roleCode" form:"roleCode"`
+	RoleName string `json:"roleName" form:"roleName"`
+}
+
 type RoleAssignPermModel struct {
 	RoleId     int64   `json:"roleId" binding:"required"`     // 角色ID
 	PermIdList []int64 `json:"permIdList" binding:"required"` // 权限ID列表

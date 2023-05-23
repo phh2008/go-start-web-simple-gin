@@ -15,6 +15,16 @@ type PermissionController struct {
 	PermissionService *service.PermissionService
 }
 
+// List 权限管理列表
+func (a *PermissionController) List(ctx *gin.Context) {
+	var req model.PermissionListReq
+	if ok, err := xgin.ShouldBindQuery(ctx, &req); !ok {
+		result.Error[any](err).Response(ctx)
+		return
+	}
+	a.PermissionService.ListPage(ctx, req).Response(ctx)
+}
+
 // AddPermission 添加权限
 func (a *PermissionController) AddPermission(ctx *gin.Context) {
 	var perm model.PermissionModel

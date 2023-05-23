@@ -137,3 +137,11 @@ func Test15(t *testing.T) {
 	ok, err := enforcer.UpdateFilteredPolicies([][]string{[]string{"xxx", "/api/v1/hello8", "GET"}, []string{"xxx", "/api/v1/hello9", "PULL"}, []string{"xxx", "/api/v1/hello10", "GET"}}, 0, "xxx")
 	fmt.Println(ok, err)
 }
+
+// 删除角色(删除角色关联用户，删除角色资源)
+// DELETE FROM `casbin_rule` WHERE ptype = 'g' and v1 = 'xxx'
+// DELETE FROM `casbin_rule` WHERE ptype = 'p' and v0 = 'xxx'
+func Test16(t *testing.T) {
+	ok, err := enforcer.DeleteRole("xxx")
+	fmt.Println(ok, err)
+}

@@ -20,6 +20,12 @@ type RoleService struct {
 	RolePermissionDao *dao.RolePermissionDao
 	PermissionDao     *dao.PermissionDao
 	Enforcer          *casbin.Enforcer
+	UserDao           *dao.UserDao
+}
+
+func (a *RoleService) ListPage(ctx context.Context, req model.RoleListReq) *result.Result[model.PageData[model.RoleModel]] {
+	data := a.RoleDao.ListPage(ctx, req)
+	return result.Ok[model.PageData[model.RoleModel]](data)
 }
 
 // Add 添加角色
@@ -76,6 +82,39 @@ func (a *RoleService) AssignPermission(ctx context.Context, assign model.RoleAss
 	a.Enforcer.DeletePermissionsForUser(role.RoleCode)
 	if len(permissions) > 0 {
 		a.Enforcer.AddPolicies(permissions)
+	}
+	return result.Success[any]()
+}
+
+// DeleteById 删除角色
+func (a *RoleService) DeleteById(ctx context.Context, id int64) *result.Result[any] {
+	role := a.RoleDao.GetById(id)
+	if role.Id == 0 {
+		return result.Success[any]()
+	}
+	err := a.RoleDao.Transaction(ctx, func(tx context.Context) error {
+		// 清空用户表上的角色字段
+		err := a.UserDao.CancelRole(ctx, role.RoleCode)
+		if err != nil {
+			return err
+		}
+		// 删除角色
+		err = a.RoleDao.DeleteById(ctx, id)
+		if err != nil {
+			return err
+		}
+		// 删除角色与资源关系
+		err = a.RolePermissionDao.DeleteByRoleId(ctx, id)
+		if err != nil {
+			return err
+		}
+		// 删除 casbin 中的角色与资源关系、角色与用户关系
+		_, err = a.Enforcer.DeleteRole(role.RoleCode)
+		return err
+	})
+	if err != nil {
+		logger.Errorf("删除角色操作失败，%s", err)
+		return result.Error[any](exception.SysError)
 	}
 	return result.Success[any]()
 }

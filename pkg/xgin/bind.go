@@ -57,6 +57,14 @@ func ShouldBindQuery(c *gin.Context, v interface{}) (bool, ValidErrors) {
 	return true, nil
 }
 
+func ShouldBindUri(c *gin.Context, v interface{}) (bool, ValidErrors) {
+	err := c.ShouldBindUri(v)
+	if err != nil {
+		return TranslateValidationError(c, err)
+	}
+	return true, nil
+}
+
 func TranslateValidationError(c *gin.Context, err error) (bool, ValidErrors) {
 	v := c.Value("trans")
 	var errs ValidErrors
