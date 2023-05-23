@@ -2,9 +2,12 @@ package exception
 
 import "fmt"
 
+var NoLogin = NewBizError("401", "未登录")
+var Unauthorized = NewBizError("402", "无权限")
+var NotFound = NewBizError("404", "资源未找到")
 var SysError = NewBizError("500", "系统错误")
-var NoLogin = NewBizError("501", "未登录")
-var Unauthorized = NewBizError("502", "无权限")
+var ParamError = NewBizError("501", "参数错误")
+var DBError = NewBizError("502", "数据系统错误")
 
 // BizError 业务错误
 type BizError struct {
