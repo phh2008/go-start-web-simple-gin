@@ -5,6 +5,7 @@ import (
 )
 
 var DaoSet = wire.NewSet(
+	BaseDaoSet,
 	TestSet,
 	PermissionSet,
 	RoleSet,

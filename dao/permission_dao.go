@@ -4,18 +4,16 @@ import (
 	"com.gientech/selection/entity"
 	"context"
 	"github.com/google/wire"
-	"gorm.io/gorm"
 )
 
 var PermissionSet = wire.NewSet(wire.Struct(new(PermissionDao), "*"))
 
 type PermissionDao struct {
-	Db *gorm.DB
+	BaseDao
 }
 
 func (a *PermissionDao) Add(ctx context.Context, permission entity.PermissionEntity) (entity.PermissionEntity, error) {
-	db := a.Db.WithContext(ctx)
-	db = db.Create(&permission)
+	db := a.GetDb(ctx).Create(&permission)
 	return permission, db.Error
 }
 

@@ -5,12 +5,12 @@ import (
 	"com.gientech/selection/entity"
 	"com.gientech/selection/model"
 	"com.gientech/selection/model/result"
+	"com.gientech/selection/pkg/exception"
 	"com.gientech/selection/pkg/logger"
 	"context"
 	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 	"github.com/jinzhu/copier"
-	"strconv"
 )
 
 var RoleSet = wire.NewSet(wire.Struct(new(RoleService), "*"))
@@ -50,19 +50,28 @@ func (a *RoleService) AssignPermission(ctx context.Context, assign model.RoleAss
 	// 构建角色与权限关系对象
 	var rolePermList []*entity.RolePermissionEntity // 角色权限关系表数据
 	var permissions [][]string                      // casbin 中的角色与权限数据
-	var roleIdString = strconv.FormatInt(assign.RoleId, 10)
 	for _, v := range permList {
 		rolePermList = append(rolePermList, &entity.RolePermissionEntity{PermId: v.Id, RoleId: assign.RoleId})
-		permissions = append(permissions, []string{roleIdString, v.Url, v.Action})
+		permissions = append(permissions, []string{role.RoleCode, v.Url, v.Action})
 	}
-	// 删除原来的角色与权限关系
-	err := a.RolePermissionDao.DeleteByRoleId(ctx, assign.RoleId)
+	err := a.RolePermissionDao.Transaction(ctx, func(tx context.Context) error {
+		// 删除原来的角色与权限关系
+		err := a.RolePermissionDao.DeleteByRoleId(tx, assign.RoleId)
+		if err != nil {
+			logger.Errorf("删除操作失败，%s", err.Error())
+			return exception.SysError
+		}
+		// 新增角色与权限关系
+		err = a.RolePermissionDao.BatchAdd(tx, rolePermList)
+		if err != nil {
+			logger.Errorf("删除操作失败，%s", err.Error())
+			return exception.SysError
+		}
+		return err
+	})
 	if err != nil {
-		logger.Errorf("删除操作失败，%s", err.Error())
-		return result.Fail[any]()
+		return result.Error[any](err)
 	}
-	// 新增角色与权限关系
-	a.RolePermissionDao.BatchAdd(ctx, rolePermList)
 	// 更新casbin中的角色与资源关系
 	a.Enforcer.DeletePermissionsForUser(role.RoleCode)
 	if len(permissions) > 0 {

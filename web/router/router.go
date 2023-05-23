@@ -41,7 +41,7 @@ func (a *Router) Register() {
 		v1.DELETE("/user/delete/:id", a.Auth.Authenticate(), a.UserApi.DeleteById)
 		//角色API
 		v1.POST("/role/add", a.RoleApi.Add)
-		v1.POST("/role/assignPermission", a.RoleApi.AssignPermission)
+		v1.POST("/role/assignPermission", a.Auth.Authenticate(), a.RoleApi.AssignPermission)
 		//权限API
 		v1.POST("/permission/add", a.PermissionApi.AddPermission)
 	}

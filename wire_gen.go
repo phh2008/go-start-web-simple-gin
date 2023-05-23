@@ -46,8 +46,11 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 		Jwt:      jwtHelper,
 		Enforcer: enforcer,
 	}
-	userDao := &dao.UserDao{
+	baseDao := dao.BaseDao{
 		Db: db,
+	}
+	userDao := &dao.UserDao{
+		BaseDao: baseDao,
 	}
 	userService := &service.UserService{
 		UserDao:  userDao,
@@ -58,7 +61,7 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 		UserService: userService,
 	}
 	permissionDao := &dao.PermissionDao{
-		Db: db,
+		BaseDao: baseDao,
 	}
 	permissionService := &service.PermissionService{
 		PermissionDao: permissionDao,
@@ -67,10 +70,10 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 		PermissionService: permissionService,
 	}
 	roleDao := &dao.RoleDao{
-		Db: db,
+		BaseDao: baseDao,
 	}
 	rolePermissionDao := &dao.RolePermissionDao{
-		Db: db,
+		BaseDao: baseDao,
 	}
 	roleService := &service.RoleService{
 		RoleDao:           roleDao,
