@@ -14,6 +14,12 @@ type PermissionDao struct {
 	BaseDao
 }
 
+func (a *PermissionDao) GetById(ctx context.Context, id int64) entity.PermissionEntity {
+	var perm entity.PermissionEntity
+	a.GetDb(ctx).First(&perm, id)
+	return perm
+}
+
 func (a *PermissionDao) ListPage(ctx context.Context, req model.PermissionListReq) model.PageData[model.PermissionModel] {
 	db := a.GetDb(ctx)
 	db = db.Model(&entity.UserEntity{})

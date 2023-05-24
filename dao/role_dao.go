@@ -58,3 +58,10 @@ func (a *RoleDao) DeleteById(ctx context.Context, id int64) error {
 	ret := a.GetDb(ctx).Delete(&entity.RoleEntity{}, id)
 	return ret.Error
 }
+
+// ListByIds 根据角色ID集合查询角色列表
+func (a *RoleDao) ListByIds(ctx context.Context, ids []int64) []entity.RoleEntity {
+	var list []entity.RoleEntity
+	a.GetDb(ctx).Find(&list, ids)
+	return list
+}

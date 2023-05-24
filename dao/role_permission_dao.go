@@ -24,3 +24,11 @@ func (a *RolePermissionDao) BatchAdd(ctx context.Context, list []*entity.RolePer
 	db := a.GetDb(ctx).Create(list)
 	return db.Error
 }
+
+func (a *RolePermissionDao) ListRoleIdByPermId(ctx context.Context, permId int64) []int64 {
+	var roleIds []int64
+	a.GetDb(ctx).Model(&entity.RolePermissionEntity{}).
+		Where("perm_id=?", permId).
+		Pluck("role_id", &roleIds)
+	return roleIds
+}
