@@ -81,6 +81,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "string",
+                        "description": "排序类型：asc、desc",
+                        "name": "direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "当前页码",
                         "name": "pageNo",
@@ -102,6 +108,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "权限类型：1-菜单、2-按钮",
                         "name": "permType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -141,7 +153,7 @@ const docTemplate = `{
                 "summary": "添加角色",
                 "parameters": [
                     {
-                        "description": "查询条件",
+                        "description": "角色信息",
                         "name": "role",
                         "in": "body",
                         "schema": {
@@ -255,6 +267,12 @@ const docTemplate = `{
                 "summary": "角色管理列表",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "排序类型：asc、desc",
+                        "name": "direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "当前页码",
                         "name": "pageNo",
@@ -276,6 +294,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "角色名称",
                         "name": "roleName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "sort",
                         "in": "query"
                     }
                 ],
@@ -304,6 +328,12 @@ const docTemplate = `{
                 "summary": "test data list",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "排序类型：asc、desc",
+                        "name": "direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "id",
                         "in": "query"
@@ -323,6 +353,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "每页数量",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -477,6 +513,12 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "排序类型：asc、desc",
+                        "name": "direction",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "邮箱",
                         "name": "email",
                         "in": "query"
@@ -497,6 +539,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "姓名",
                         "name": "realName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "sort",
                         "in": "query"
                     },
                     {

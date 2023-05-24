@@ -465,6 +465,10 @@ paths:
         in: query
         name: action
         type: string
+      - description: 排序类型：asc、desc
+        in: query
+        name: direction
+        type: string
       - description: 当前页码
         in: query
         name: pageNo
@@ -481,6 +485,10 @@ paths:
         in: query
         name: permType
         type: integer
+      - description: 排序字段
+        in: query
+        name: sort
+        type: string
       - description: URL路径
         in: query
         name: url
@@ -503,7 +511,7 @@ paths:
       - application/json
       description: 添加角色
       parameters:
-      - description: 查询条件
+      - description: 角色信息
         in: body
         name: role
         schema:
@@ -573,6 +581,10 @@ paths:
       - application/json
       description: 角色管理列表
       parameters:
+      - description: 排序类型：asc、desc
+        in: query
+        name: direction
+        type: string
       - description: 当前页码
         in: query
         name: pageNo
@@ -588,6 +600,10 @@ paths:
       - description: 角色名称
         in: query
         name: roleName
+        type: string
+      - description: 排序字段
+        in: query
+        name: sort
         type: string
       produces:
       - application/json
@@ -607,6 +623,10 @@ paths:
       - application/json
       description: get list by ID
       parameters:
+      - description: 排序类型：asc、desc
+        in: query
+        name: direction
+        type: string
       - in: query
         name: id
         type: integer
@@ -621,6 +641,10 @@ paths:
         in: query
         name: pageSize
         type: integer
+      - description: 排序字段
+        in: query
+        name: sort
+        type: string
       - in: query
         name: status
         type: integer
@@ -712,6 +736,10 @@ paths:
       - application/json
       description: 用户管理列表
       parameters:
+      - description: 排序类型：asc、desc
+        in: query
+        name: direction
+        type: string
       - description: 邮箱
         in: query
         name: email
@@ -727,6 +755,10 @@ paths:
       - description: 姓名
         in: query
         name: realName
+        type: string
+      - description: 排序字段
+        in: query
+        name: sort
         type: string
       - description: '状态: 1-启用，2-禁用'
         in: query

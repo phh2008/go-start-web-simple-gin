@@ -26,7 +26,12 @@ func (a *UserDao) ListPage(ctx context.Context, req model.UserListReq) model.Pag
 	if req.Status != 0 {
 		db = db.Where("status=?", req.Status)
 	}
-	pageData, db := orm.QueryPageData[model.UserModel](db, req.GetPageNo(), req.GetPageSize())
+	var pageData model.PageData[model.UserModel]
+	pageData.PageNo = req.GetPageNo()
+	pageData.PageSize = req.GetPageSize()
+	db.Count(&pageData.Count).
+		Scopes(orm.OrderScope(req.Sort, req.Direction), orm.PageScope(req.GetPageNo(), req.GetPageSize())).
+		Find(&pageData.Data)
 	return pageData
 }
 

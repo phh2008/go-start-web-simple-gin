@@ -3,6 +3,8 @@ package orm
 import (
 	"com.gientech/selection/model"
 	"com.gientech/selection/pkg/config"
+	"com.gientech/selection/util"
+	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,6 +19,29 @@ func InitDB(config *config.Config) *gorm.DB {
 		panic(err)
 	}
 	return gdb
+}
+
+func emptyScope() func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db
+	}
+}
+
+func OrderScope(field string, direct string) func(db *gorm.DB) *gorm.DB {
+	if field == "" {
+		return emptyScope()
+	}
+	if !util.ColumnReg.MatchString(field) {
+		// 非法字段
+		return emptyScope()
+	}
+	if !util.DerectReg.MatchString(direct) {
+		return emptyScope()
+	}
+	sort := fmt.Sprintf("%s %s", field, direct)
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Order(sort)
+	}
 }
 
 func PageScope(pageNo, pageSize int) func(db *gorm.DB) *gorm.DB {

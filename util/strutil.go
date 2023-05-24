@@ -7,6 +7,7 @@ import (
 
 var snakeReg = regexp.MustCompile("[A-Z][a-z]")
 var ColumnReg = regexp.MustCompile("^[A-Za-z0-9_]+$") //字母数字下划线
+var DerectReg = regexp.MustCompile("^asc|desc|ASC|DESC$")
 
 const underline = "_"
 
