@@ -23,7 +23,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "添加权限",
+                "description": "更新权限",
                 "consumes": [
                     "application/json"
                 ],
@@ -33,7 +33,7 @@ const docTemplate = `{
                 "tags": [
                     "权限"
                 ],
-                "summary": "添加权限",
+                "summary": "更新权限",
                 "parameters": [
                     {
                         "description": "权限信息",

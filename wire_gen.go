@@ -65,6 +65,7 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 	}
 	permissionService := &service.PermissionService{
 		PermissionDao: permissionDao,
+		Enforcer:      enforcer,
 	}
 	permissionController := &controller.PermissionController{
 		PermissionService: permissionService,
@@ -80,6 +81,7 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 		RolePermissionDao: rolePermissionDao,
 		PermissionDao:     permissionDao,
 		Enforcer:          enforcer,
+		UserDao:           userDao,
 	}
 	roleController := &controller.RoleController{
 		RoleService: roleService,

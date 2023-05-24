@@ -37,7 +37,7 @@ func (a *Router) Register() {
 		//用户API
 		v1.POST("/user/login", a.UserApi.Login)
 		v1.GET("/user/list", a.Auth.Authorization("get"), a.UserApi.List)
-		v1.POST("/user/createByEmail", a.Auth.Authenticate(), a.UserApi.CreateByEmail)
+		v1.POST("/user/createByEmail", a.UserApi.CreateByEmail)
 		v1.POST("/user/assignRole", a.Auth.Authorization("post"), a.UserApi.AssignRole)
 		v1.DELETE("/user/delete/:id", a.Auth.Authorization("delete"), a.UserApi.DeleteById)
 		//角色API
@@ -47,7 +47,8 @@ func (a *Router) Register() {
 		v1.DELETE("/role/delete/:id", a.Auth.Authorization("delete"), a.RoleApi.Delete)
 		//权限API
 		v1.GET("/permission/list", a.Auth.Authorization("get"), a.PermissionApi.List)
-		v1.POST("/permission/add", a.Auth.Authorization("post"), a.PermissionApi.AddPermission)
+		v1.POST("/permission/add", a.Auth.Authorization("post"), a.PermissionApi.Add)
+		v1.POST("/permission/update", a.Auth.Authorization("post"), a.PermissionApi.Update)
 	}
 
 	// use ginSwagger middleware to serve the API docs

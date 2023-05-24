@@ -85,7 +85,7 @@ func Test7(t *testing.T) {
 // 验证是否具有权限（添加了用户与角色关系时，可以用角色或用户来检查）
 func Test8(t *testing.T) {
 	//ret, err := enforcer.Enforce("tom", "/api/v1/hello", "GET")
-	ret, err := enforcer.Enforce("root", "/api/v1/hello2", "GET")
+	ret, err := enforcer.Enforce("root", "/api/v1/test/:idx", "GET")
 	if err != nil {
 		panic(err)
 	}
@@ -144,4 +144,9 @@ func Test15(t *testing.T) {
 func Test16(t *testing.T) {
 	ok, err := enforcer.DeleteRole("xxx")
 	fmt.Println(ok, err)
+}
+
+func Test17(t *testing.T) {
+	permList := enforcer.GetFilteredPolicy(3, "4")
+	fmt.Println(permList)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
 	"github.com/jinzhu/copier"
+	"strconv"
 )
 
 var RoleSet = wire.NewSet(wire.Struct(new(RoleService), "*"))
@@ -58,7 +59,7 @@ func (a *RoleService) AssignPermission(ctx context.Context, assign model.RoleAss
 	var permissions [][]string                      // casbin 中的角色与权限数据
 	for _, v := range permList {
 		rolePermList = append(rolePermList, &entity.RolePermissionEntity{PermId: v.Id, RoleId: assign.RoleId})
-		permissions = append(permissions, []string{role.RoleCode, v.Url, v.Action})
+		permissions = append(permissions, []string{role.RoleCode, v.Url, v.Action, strconv.FormatInt(v.Id, 10)})
 	}
 	err := a.RolePermissionDao.Transaction(ctx, func(tx context.Context) error {
 		// 删除原来的角色与权限关系

@@ -38,6 +38,11 @@ func (a *PermissionDao) Add(ctx context.Context, permission entity.PermissionEnt
 	return permission, db.Error
 }
 
+func (a *PermissionDao) Update(ctx context.Context, permission entity.PermissionEntity) (entity.PermissionEntity, error) {
+	db := a.GetDb(ctx).Model(&permission).Updates(permission)
+	return permission, db.Error
+}
+
 func (a *PermissionDao) FindByIdList(idList []int64) []entity.PermissionEntity {
 	var list []entity.PermissionEntity
 	if len(idList) == 0 {

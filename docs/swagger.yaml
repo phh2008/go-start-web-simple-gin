@@ -435,7 +435,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 添加权限
+      description: 更新权限
       parameters:
       - description: 权限信息
         in: body
@@ -452,7 +452,7 @@ paths:
             $ref: '#/definitions/result.Result-entity_PermissionEntity'
       security:
       - ApiKeyAuth: []
-      summary: 添加权限
+      summary: 更新权限
       tags:
       - 权限
   /permission/list:

@@ -5,6 +5,7 @@ import (
 	"com.gientech/selection/model/result"
 	"com.gientech/selection/pkg/xgin"
 	"com.gientech/selection/service"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 )
@@ -35,7 +36,7 @@ func (a *PermissionController) List(ctx *gin.Context) {
 	a.PermissionService.ListPage(ctx, req).Response(ctx)
 }
 
-// AddPermission 添加权限
+// Add 添加权限
 //
 //	@Summary		添加权限
 //	@Description	添加权限
@@ -46,11 +47,35 @@ func (a *PermissionController) List(ctx *gin.Context) {
 //	@Param			perm	body		model.PermissionModel	true	"权限信息"
 //	@Success		200		{object}	result.Result[entity.PermissionEntity]
 //	@Router			/permission/add [post]
-func (a *PermissionController) AddPermission(ctx *gin.Context) {
+func (a *PermissionController) Add(ctx *gin.Context) {
 	var perm model.PermissionModel
 	if ok, err := xgin.ShouldBindJSON(ctx, &perm); !ok {
 		result.Error[any](err).Response(ctx)
 		return
 	}
 	a.PermissionService.Add(ctx, perm).Response(ctx)
+}
+
+// Update 更新权限
+//
+//	@Summary		更新权限
+//	@Description	更新权限
+//	@Tags			权限
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			perm	body		model.PermissionModel	true	"权限信息"
+//	@Success		200		{object}	result.Result[entity.PermissionEntity]
+//	@Router			/permission/add [post]
+func (a *PermissionController) Update(ctx *gin.Context) {
+	var perm model.PermissionModel
+	if ok, err := xgin.ShouldBindJSON(ctx, &perm); !ok {
+		result.Error[any](err).Response(ctx)
+		return
+	}
+	if perm.Id == 0 {
+		result.Error[any](errors.New("id不能为空")).Response(ctx)
+		return
+	}
+	a.PermissionService.Update(ctx, perm).Response(ctx)
 }
