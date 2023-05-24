@@ -11,7 +11,7 @@
  Target Server Version : 80030
  File Encoding         : 65001
 
- Date: 22/05/2023 18:56:05
+ Date: 24/05/2023 18:30:57
 */
 
 SET NAMES utf8mb4;
@@ -32,14 +32,19 @@ CREATE TABLE `casbin_rule`  (
   `v5` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_casbin_rule`(`ptype` ASC, `v0` ASC, `v1` ASC, `v2` ASC, `v3` ASC, `v4` ASC, `v5` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of casbin_rule
 -- ----------------------------
 INSERT INTO `casbin_rule` VALUES (1, 'g', '2', 'root', '', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2, 'p', '3', '/api/v1/role/add', 'post', '', '', '');
-INSERT INTO `casbin_rule` VALUES (3, 'p', '3', '/api/v1/user/assignRole', 'post', '', '', '');
+INSERT INTO `casbin_rule` VALUES (24, 'g', '3', 'finance', '', '', '', '');
+INSERT INTO `casbin_rule` VALUES (149, 'p', 'finance', '/api/v1/test/tta/:idx', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (44, 'p', 'finance', '/api/v1/user/delete/:id', 'delete', '', '', '');
+INSERT INTO `casbin_rule` VALUES (148, 'p', 'systemAdmin', '/api/v1/test/tta/:idx', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (41, 'p', 'systemAdmin', '/api/v1/user/assignRole', 'post', '', '', '');
+INSERT INTO `casbin_rule` VALUES (42, 'p', 'systemAdmin', '/api/v1/user/delete/:id', 'delete', '', '', '');
+INSERT INTO `casbin_rule` VALUES (40, 'p', 'systemAdmin', '/api/v1/user/list', 'get', '', '', '');
 
 -- ----------------------------
 -- Table structure for sys_permission
@@ -58,13 +63,22 @@ CREATE TABLE `sys_permission`  (
   `update_by` bigint NOT NULL DEFAULT 0 COMMENT '更新人',
   `deleted` tinyint NOT NULL DEFAULT 1 COMMENT '是否删除：1-否，2-是',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '权限表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '权限表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_permission
 -- ----------------------------
-INSERT INTO `sys_permission` VALUES (1, '添加角色', '/api/v1/role/add', 'post', 2, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0);
-INSERT INTO `sys_permission` VALUES (2, '分配角色', '/api/v1/user/assignRole', 'post', 2, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0);
+INSERT INTO `sys_permission` VALUES (4, '用户管理', '/api/v1/user/list', 'get', 1, 0, '2023-05-23 16:12:57', '2023-05-23 16:12:57', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (5, '分配角色', '/api/v1/user/assignRole', 'post', 2, 4, '2023-05-23 16:14:45', '2023-05-23 16:14:45', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (6, '删除用户', '/api/v1/user/delete/:id', 'delete', 2, 4, '2023-05-23 16:15:17', '2023-05-23 16:15:17', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (7, '角色管理', '/api/v1/role/list', 'get', 1, 0, '2023-05-23 16:15:50', '2023-05-23 16:15:50', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (8, '添加角色', '/api/v1/role/add', 'post', 2, 7, '2023-05-23 16:16:31', '2023-05-23 16:16:31', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (9, '分配权限', '/api/v1/role/assignPermission', 'post', 2, 7, '2023-05-23 16:16:56', '2023-05-23 16:16:56', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (10, '删除角色', '/api/v1/role/delete/:id', 'delete', 2, 7, '2023-05-23 16:17:20', '2023-05-23 16:17:20', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (11, '权限管理', '/api/v1/permission/list', 'get', 1, 0, '2023-05-23 16:17:43', '2023-05-23 16:17:43', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (12, '添加权限', '/api/v1/permission/add', 'post', 2, 11, '2023-05-23 16:18:50', '2023-05-23 16:18:50', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (13, '测试', '/api/v1/test/tta/:idx', 'GET', 1, 0, '2023-05-24 15:17:42', '2023-05-24 18:22:23', 2, 2, 1);
+INSERT INTO `sys_permission` VALUES (14, '修改权限', '/api/v1/permission/update', 'post', 2, 11, '2023-05-24 18:21:36', '2023-05-24 18:21:36', 2, 2, 1);
 
 -- ----------------------------
 -- Table structure for sys_role
@@ -80,13 +94,14 @@ CREATE TABLE `sys_role`  (
   `update_by` bigint NOT NULL DEFAULT 0 COMMENT '更新人',
   `deleted` tinyint NOT NULL DEFAULT 1 COMMENT '是否删除：1-否，2-是',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
-INSERT INTO `sys_role` VALUES (2, 'root', '超级管理员', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0);
-INSERT INTO `sys_role` VALUES (3, 'systemAdmin', '系统管理员', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0);
+INSERT INTO `sys_role` VALUES (2, 'root', '超级管理员', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 1);
+INSERT INTO `sys_role` VALUES (3, 'systemAdmin', '系统管理员', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 1);
+INSERT INTO `sys_role` VALUES (9, 'finance', '财务主管', '2023-05-24 15:07:25', '2023-05-24 15:07:25', 2, 2, 1);
 
 -- ----------------------------
 -- Table structure for sys_role_permission
@@ -97,13 +112,17 @@ CREATE TABLE `sys_role_permission`  (
   `role_id` bigint NOT NULL DEFAULT 0 COMMENT '角色编号',
   `perm_id` bigint NOT NULL DEFAULT 0 COMMENT '权限ID',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色权限表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色权限表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role_permission
 -- ----------------------------
-INSERT INTO `sys_role_permission` VALUES (1, 3, 1);
-INSERT INTO `sys_role_permission` VALUES (2, 3, 2);
+INSERT INTO `sys_role_permission` VALUES (60, 3, 4);
+INSERT INTO `sys_role_permission` VALUES (61, 3, 5);
+INSERT INTO `sys_role_permission` VALUES (62, 3, 6);
+INSERT INTO `sys_role_permission` VALUES (63, 3, 13);
+INSERT INTO `sys_role_permission` VALUES (64, 9, 6);
+INSERT INTO `sys_role_permission` VALUES (65, 9, 13);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -123,13 +142,16 @@ CREATE TABLE `sys_user`  (
   `update_by` bigint NOT NULL DEFAULT 0 COMMENT '更新人',
   `deleted` tinyint NOT NULL DEFAULT 1 COMMENT '是否删除：1-否，2-是',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (2, 'phh2008@vip.qq.com', 'phh2008@vip.qq.com', 'phh2008@vip.qq.com', '$2a$10$ITxtKZMlLHEqVQU7x5C62OGyDPiduBNGxKBEZRRJ/jkJnFG2.TSi.', 1, 'root', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0);
-INSERT INTO `sys_user` VALUES (3, '10000@qq.com', '10000@qq.com', '10000@qq.com', '$2a$10$cKUbSKq3jZFGjYiFQ4wpjukcpZL9tSRO5UolVtpDkPDUah8nR6YLa', 1, '', '2023-05-22 18:51:02', '2023-05-22 18:51:02', 0, 0, 1);
+INSERT INTO `sys_user` VALUES (2, 'phh2008@vip.qq.com', 'phh2008@vip.qq.com', 'phh2008@vip.qq.com', '$2a$10$ITxtKZMlLHEqVQU7x5C62OGyDPiduBNGxKBEZRRJ/jkJnFG2.TSi.', 1, 'root', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 1);
+INSERT INTO `sys_user` VALUES (3, '10000@qq.com', '10000@qq.com', '10000@qq.com', '$2a$10$cKUbSKq3jZFGjYiFQ4wpjukcpZL9tSRO5UolVtpDkPDUah8nR6YLa', 1, 'finance', '2023-05-22 18:51:02', '2023-05-24 15:10:52', 0, 0, 1);
+INSERT INTO `sys_user` VALUES (4, '10001@qq.com', '10001@qq.com', '10001@qq.com', '$2a$10$sb6dMahwl85887KtX/ATO.Wob0NsR0UouuRjpOQaEs.qPC2LQxB6q', 1, '', '2023-05-24 09:40:45', '2023-05-24 09:40:45', 2, 2, 1);
+INSERT INTO `sys_user` VALUES (5, '10002@qq.com', '10002@qq.com', '10002@qq.com', '$2a$10$i0q/k0Qtc79MYWNHKlpCpu2sPaAKQ3cawWwF0ISEQU7C.nhrvVFfO', 1, '', '2023-05-24 09:41:10', '2023-05-24 09:41:10', 2, 2, 1);
+INSERT INTO `sys_user` VALUES (6, '10003@qq.com', '10003@qq.com', '10003@qq.com', '$2a$10$cZ8eslmKEHsvhUOthDvACOvQiduSNxasvnSy8g2jEyxNOgJ6DADV2', 1, '', '2023-05-24 15:08:00', '2023-05-24 15:08:00', 2, 2, 1);
 
 -- ----------------------------
 -- Table structure for test
