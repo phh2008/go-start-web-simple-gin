@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/google/uuid"
 	"regexp"
 	"strings"
 )
@@ -17,4 +18,9 @@ func SnakeCase(src string) string {
 		return underline + s
 	})
 	return strings.ToLower(strings.TrimLeft(str, underline))
+}
+
+func UUID() string {
+	u, _ := uuid.NewUUID()
+	return strings.ReplaceAll(u.String(), "-", "")
 }

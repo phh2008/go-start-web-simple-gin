@@ -12,3 +12,9 @@ func TestSnakeCase(t *testing.T) {
 	des := SnakeCase(words)
 	log.Println(des)
 }
+
+func TestUuid(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		log.Println(UUID())
+	}
+}

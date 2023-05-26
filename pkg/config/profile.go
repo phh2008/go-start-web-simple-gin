@@ -9,8 +9,9 @@ type Profile struct {
 }
 
 type Server struct {
-	Port string `yaml:"port" json:"port"`
-	Env  string `yaml:"env" json:"env"`
+	Port      string `yaml:"port" json:"port"`
+	Env       string `yaml:"env" json:"env"`
+	SignToken string `yaml:"signToken" json:"signToken"`
 }
 
 type Db struct {
