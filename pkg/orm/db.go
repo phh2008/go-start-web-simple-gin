@@ -35,7 +35,7 @@ func OrderScope(field string, direct string) func(db *gorm.DB) *gorm.DB {
 		// 非法字段
 		return emptyScope()
 	}
-	if !util.DerectReg.MatchString(direct) {
+	if !util.DirectReg.MatchString(direct) {
 		return emptyScope()
 	}
 	sort := fmt.Sprintf("%s %s", field, direct)

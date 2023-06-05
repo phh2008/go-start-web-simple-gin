@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"log"
 	"testing"
 )
@@ -13,8 +14,14 @@ func TestSnakeCase(t *testing.T) {
 	log.Println(des)
 }
 
-func TestUuid(t *testing.T) {
+func TestUUID(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		log.Println(UUID())
+	}
+}
+
+func TestRandom(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		fmt.Println(Random(14))
 	}
 }
