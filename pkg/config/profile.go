@@ -9,9 +9,10 @@ type Profile struct {
 }
 
 type Server struct {
-	Port      string `yaml:"port" json:"port"`
-	Env       string `yaml:"env" json:"env"`
-	SignToken string `yaml:"signToken" json:"signToken"`
+	Port       string `yaml:"port" json:"port"`
+	Env        string `yaml:"env" json:"env"`
+	SignToken  string `yaml:"signToken" json:"signToken"`
+	ExpireTime int64  `yaml:"expireTime" json:"expireTime"` // 签名有效期
 }
 
 type Db struct {

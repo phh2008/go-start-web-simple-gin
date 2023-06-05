@@ -1,6 +1,10 @@
 server:
   port: 8089
   env: test
+  # 签名token
+  signToken: 0ee569b1039911eea41f00ff36392f40
+  # 签名有效期 (秒)
+  expireTime: 60
 jwt:
   key: abc123
 # 数据库配置
