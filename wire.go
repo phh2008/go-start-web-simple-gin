@@ -21,12 +21,12 @@ import (
 func BuildServer(configFolder config.ConfigFolder) *app.Server {
 	wire.Build(
 		pkg.ToolSet,
-		dao.DaoSet,
-		service.ServiceSet,
-		controller.ControllerSet,
+		dao.ProviderSet,
+		service.ProviderSet,
+		controller.ProviderSet,
 		gin.New,
-		middleware.MiddleWareSet,
-		router.RouterSet,
+		middleware.ProviderSet,
+		router.ProviderSet,
 		app.ServerSet,
 	)
 	return new(app.Server)

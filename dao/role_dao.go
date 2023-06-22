@@ -6,13 +6,18 @@ import (
 	"com.gientech/selection/pkg/exception"
 	"com.gientech/selection/pkg/orm"
 	"context"
-	"github.com/google/wire"
+	"gorm.io/gorm"
 )
 
-var RoleSet = wire.NewSet(wire.Struct(new(RoleDao), "*"))
-
 type RoleDao struct {
-	BaseDao
+	BaseDao[entity.RoleEntity]
+}
+
+// NewRoleDAO 创建 dao
+func NewRoleDAO(db *gorm.DB) *RoleDao {
+	return &RoleDao{
+		NewBaseDAO[entity.RoleEntity](db),
+	}
 }
 
 func (a *RoleDao) ListPage(ctx context.Context, req model.RoleListReq) model.PageData[model.RoleModel] {
@@ -26,13 +31,6 @@ func (a *RoleDao) ListPage(ctx context.Context, req model.RoleListReq) model.Pag
 	}
 	pageData, db := orm.QueryPageData[model.RoleModel](db, req.GetPageNo(), req.GetPageSize())
 	return pageData
-}
-
-func (a *RoleDao) GetById(id int64) entity.RoleEntity {
-	db := a.Db
-	var role entity.RoleEntity
-	db.First(&role, id)
-	return role
 }
 
 // Add 添加角色

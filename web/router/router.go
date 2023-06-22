@@ -11,12 +11,12 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-var RouterSet = wire.NewSet(wire.Struct(new(Router), "*"))
+// ProviderSet is router provider set
+var ProviderSet = wire.NewSet(wire.Struct(new(Router), "*"))
 
 type Router struct {
 	Engine        *gin.Engine
 	HelloApi      *controller.HelloController
-	TestApi       *controller.TestController
 	Auth          *middleware.Auth
 	UserApi       *controller.UserController
 	PermissionApi *controller.PermissionController
@@ -29,9 +29,6 @@ func (a *Router) Register() {
 	{
 		//测试用的API，请删除
 		v1.GET("/hello", a.HelloApi.Hello)
-		v1.GET("/test/token", a.TestApi.GetToken)
-		v1.GET("/test/auth", a.Auth.Authenticate(), a.TestApi.Auth)          // 要登录
-		v1.GET("/test/query", a.Auth.Authorization("view"), a.TestApi.Query) //要权限
 	}
 	{
 		//用户API

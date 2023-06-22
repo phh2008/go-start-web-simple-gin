@@ -2,13 +2,16 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"net/http"
 )
 
-var HelloSet = wire.NewSet(wire.Struct(new(HelloController), "*"))
-
+// HelloController hello api
 type HelloController struct {
+}
+
+// NewHelloController new hello api
+func NewHelloController() *HelloController {
+	return &HelloController{}
 }
 
 // Hello 测试 api

@@ -7,13 +7,16 @@ import (
 	"com.gientech/selection/service"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 )
 
-var PermissionSet = wire.NewSet(wire.Struct(new(PermissionController), "*"))
-
+// PermissionController 权限资源 api
 type PermissionController struct {
-	PermissionService *service.PermissionService
+	permissionService *service.PermissionService
+}
+
+// NewPermissionController 创建权限 api
+func NewPermissionController(permissionService *service.PermissionService) *PermissionController {
+	return &PermissionController{permissionService: permissionService}
 }
 
 // List 权限管理列表
@@ -33,7 +36,7 @@ func (a *PermissionController) List(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.PermissionService.ListPage(ctx, req).Response(ctx)
+	a.permissionService.ListPage(ctx, req).Response(ctx)
 }
 
 // Add 添加权限
@@ -53,7 +56,7 @@ func (a *PermissionController) Add(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.PermissionService.Add(ctx, perm).Response(ctx)
+	a.permissionService.Add(ctx, perm).Response(ctx)
 }
 
 // Update 更新权限
@@ -77,5 +80,5 @@ func (a *PermissionController) Update(ctx *gin.Context) {
 		result.Error[any](errors.New("id不能为空")).Response(ctx)
 		return
 	}
-	a.PermissionService.Update(ctx, perm).Response(ctx)
+	a.permissionService.Update(ctx, perm).Response(ctx)
 }

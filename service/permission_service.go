@@ -9,26 +9,37 @@ import (
 	"com.gientech/selection/pkg/logger"
 	"context"
 	"github.com/casbin/casbin/v2"
-	"github.com/google/wire"
 	"github.com/jinzhu/copier"
 )
 
-var PermissionSet = wire.NewSet(wire.Struct(new(PermissionService), "*"))
-
+// PermissionService 权限服务
 type PermissionService struct {
-	PermissionDao *dao.PermissionDao
-	Enforcer      *casbin.Enforcer
+	permissionDao *dao.PermissionDao
+	enforcer      *casbin.Enforcer
 }
 
+// NewPermissionService 创建服务
+func NewPermissionService(
+	permissionDao *dao.PermissionDao,
+	enforcer *casbin.Enforcer,
+) *PermissionService {
+	return &PermissionService{
+		permissionDao: permissionDao,
+		enforcer:      enforcer,
+	}
+}
+
+// ListPage 权限资源列表
 func (a *PermissionService) ListPage(ctx context.Context, req model.PermissionListReq) *result.Result[model.PageData[model.PermissionModel]] {
-	data := a.PermissionDao.ListPage(ctx, req)
+	data := a.permissionDao.ListPage(ctx, req)
 	return result.Ok[model.PageData[model.PermissionModel]](data)
 }
 
+// Add 添加权限资源
 func (a *PermissionService) Add(ctx context.Context, perm model.PermissionModel) *result.Result[entity.PermissionEntity] {
 	var permission entity.PermissionEntity
 	copier.Copy(&permission, &perm)
-	res, err := a.PermissionDao.Add(ctx, permission)
+	res, err := a.permissionDao.Add(ctx, permission)
 	if err != nil {
 		logger.Errorf("添加权限资源失败，%s", err.Error())
 		return result.Failure[entity.PermissionEntity]("添加权限资源失败")
@@ -36,21 +47,22 @@ func (a *PermissionService) Add(ctx context.Context, perm model.PermissionModel)
 	return result.Ok(res)
 }
 
+// Update 更新权限资源
 func (a *PermissionService) Update(ctx context.Context, perm model.PermissionModel) *result.Result[*entity.PermissionEntity] {
-	oldPerm := a.PermissionDao.GetById(ctx, perm.Id)
+	oldPerm, _ := a.permissionDao.GetById(ctx, perm.Id)
 	if oldPerm.Id == 0 {
 		return result.Error[*entity.PermissionEntity](exception.NotFound)
 	}
 	var permission entity.PermissionEntity
 	copier.Copy(&permission, &perm)
 	// 更新权限资源表
-	res, err := a.PermissionDao.Update(ctx, permission)
+	res, err := a.permissionDao.Update(ctx, permission)
 	if err != nil {
 		logger.Errorf("更新权限资源失败，%s", err.Error())
 		return result.Failure[*entity.PermissionEntity]("更新权限资源失败")
 	}
 	// 获取角色与资源列表,比如：[[systemAdmin /api/v1/user/list get] [guest /api/v1/user/list get]]
-	perms := a.Enforcer.GetFilteredPolicy(1, oldPerm.Url, oldPerm.Action)
+	perms := a.enforcer.GetFilteredPolicy(1, oldPerm.Url, oldPerm.Action)
 	// 更新casbin中的数据
 	if len(perms) > 0 {
 		for i, v := range perms {
@@ -59,7 +71,7 @@ func (a *PermissionService) Update(ctx context.Context, perm model.PermissionMod
 			item[2] = res.Action
 			perms[i] = item
 		}
-		_, err = a.Enforcer.UpdateFilteredPolicies(perms, 1, oldPerm.Url, oldPerm.Action)
+		_, err = a.enforcer.UpdateFilteredPolicies(perms, 1, oldPerm.Url, oldPerm.Action)
 		if err != nil {
 			logger.Errorf("更新casbin中的权限错误: %s", err)
 		}

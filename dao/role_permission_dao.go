@@ -3,13 +3,18 @@ package dao
 import (
 	"com.gientech/selection/entity"
 	"context"
-	"github.com/google/wire"
+	"gorm.io/gorm"
 )
 
-var RolePermissionSet = wire.NewSet(wire.Struct(new(RolePermissionDao), "*"))
-
 type RolePermissionDao struct {
-	BaseDao
+	BaseDao[entity.RolePermissionEntity]
+}
+
+// NewRolePermissionDAO 创建 dao
+func NewRolePermissionDAO(db *gorm.DB) *RolePermissionDao {
+	return &RolePermissionDao{
+		NewBaseDAO[entity.RolePermissionEntity](db),
+	}
 }
 
 func (a *RolePermissionDao) DeleteByRoleId(ctx context.Context, roleId int64) error {

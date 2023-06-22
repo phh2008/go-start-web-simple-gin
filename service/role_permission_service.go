@@ -2,11 +2,16 @@ package service
 
 import (
 	"com.gientech/selection/dao"
-	"github.com/google/wire"
 )
 
-var RolePermissionSet = wire.NewSet(wire.Struct(new(RolePermissionService), "*"))
-
+// RolePermissionService 角色权限关系
 type RolePermissionService struct {
-	RolePermissionDao *dao.RolePermissionDao
+	rolePermissionDao *dao.RolePermissionDao
+}
+
+// NewRolePermissionService 创建服务
+func NewRolePermissionService(rolePermissionDao *dao.RolePermissionDao) *RolePermissionService {
+	return &RolePermissionService{
+		rolePermissionDao: rolePermissionDao,
+	}
 }

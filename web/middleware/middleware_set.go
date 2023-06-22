@@ -2,4 +2,5 @@ package middleware
 
 import "github.com/google/wire"
 
-var MiddleWareSet = wire.NewSet(AuthSet)
+// ProviderSet is middleware provider set
+var ProviderSet = wire.NewSet(NewAuth)

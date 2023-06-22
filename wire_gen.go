@@ -28,69 +28,23 @@ func BuildServer(configFolder config.ConfigFolder) *app.Server {
 	db := orm.InitDB(configConfig)
 	zapLogger := logger.InitLogger(configConfig)
 	engine := gin.New()
-	helloController := &controller.HelloController{}
-	testDAO := &dao.TestDAO{
-		Db: db,
-	}
-	testService := &service.TestService{
-		TestDao: testDAO,
-	}
+	helloController := controller.NewHelloController()
 	jwtHelper := xjwt.NewJwtHelper(configConfig)
 	enforcer := xcasbin.NewCasbin(db, configConfig)
-	testController := &controller.TestController{
-		TestService: testService,
-		Jwt:         jwtHelper,
-		Enforcer:    enforcer,
-	}
-	auth := &middleware.Auth{
-		Jwt:      jwtHelper,
-		Enforcer: enforcer,
-	}
-	baseDao := dao.BaseDao{
-		Db: db,
-	}
-	userDao := &dao.UserDao{
-		BaseDao: baseDao,
-	}
-	userService := &service.UserService{
-		UserDao:  userDao,
-		Jwt:      jwtHelper,
-		Enforcer: enforcer,
-	}
-	userController := &controller.UserController{
-		UserService: userService,
-	}
-	permissionDao := &dao.PermissionDao{
-		BaseDao: baseDao,
-	}
-	permissionService := &service.PermissionService{
-		PermissionDao: permissionDao,
-		Enforcer:      enforcer,
-	}
-	permissionController := &controller.PermissionController{
-		PermissionService: permissionService,
-	}
-	roleDao := &dao.RoleDao{
-		BaseDao: baseDao,
-	}
-	rolePermissionDao := &dao.RolePermissionDao{
-		BaseDao: baseDao,
-	}
-	roleService := &service.RoleService{
-		RoleDao:           roleDao,
-		RolePermissionDao: rolePermissionDao,
-		PermissionDao:     permissionDao,
-		Enforcer:          enforcer,
-		UserDao:           userDao,
-	}
-	roleController := &controller.RoleController{
-		RoleService: roleService,
-		UserService: userService,
-	}
+	auth := middleware.NewAuth(jwtHelper, enforcer)
+	userDao := dao.NewUserDAO(db)
+	userService := service.NewUserService(userDao, jwtHelper, enforcer)
+	userController := controller.NewUserController(userService)
+	permissionDao := dao.NewPermissionDAO(db)
+	permissionService := service.NewPermissionService(permissionDao, enforcer)
+	permissionController := controller.NewPermissionController(permissionService)
+	roleDao := dao.NewRoleDAO(db)
+	rolePermissionDao := dao.NewRolePermissionDAO(db)
+	roleService := service.NewRoleService(roleDao, rolePermissionDao, permissionDao, enforcer, userDao)
+	roleController := controller.NewRoleController(roleService, userService)
 	routerRouter := &router.Router{
 		Engine:        engine,
 		HelloApi:      helloController,
-		TestApi:       testController,
 		Auth:          auth,
 		UserApi:       userController,
 		PermissionApi: permissionController,

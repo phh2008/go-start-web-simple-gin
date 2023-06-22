@@ -4,11 +4,10 @@ import (
 	"github.com/google/wire"
 )
 
-var DaoSet = wire.NewSet(
-	BaseDaoSet,
-	TestSet,
-	PermissionSet,
-	RoleSet,
-	RolePermissionSet,
-	UserSet,
+// ProviderSet is dao provider set
+var ProviderSet = wire.NewSet(
+	NewPermissionDAO,
+	NewRoleDAO,
+	NewRolePermissionDAO,
+	NewUserDAO,
 )

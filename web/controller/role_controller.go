@@ -7,15 +7,24 @@ import (
 	"com.gientech/selection/pkg/xgin"
 	"com.gientech/selection/service"
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"strconv"
 )
 
-var RoleSet = wire.NewSet(wire.Struct(new(RoleController), "*"))
-
+// RoleController 角色 api
 type RoleController struct {
-	RoleService *service.RoleService
-	UserService *service.UserService
+	roleService *service.RoleService
+	userService *service.UserService
+}
+
+// NewRoleController 创建角色 api
+func NewRoleController(
+	roleService *service.RoleService,
+	userService *service.UserService,
+) *RoleController {
+	return &RoleController{
+		roleService: roleService,
+		userService: userService,
+	}
 }
 
 // List 角色管理列表
@@ -35,7 +44,7 @@ func (a *RoleController) List(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.RoleService.ListPage(ctx, req).Response(ctx)
+	a.roleService.ListPage(ctx, req).Response(ctx)
 }
 
 // Add 添加角色
@@ -55,7 +64,7 @@ func (a *RoleController) Add(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.RoleService.Add(ctx, roleModel).Response(ctx)
+	a.roleService.Add(ctx, roleModel).Response(ctx)
 }
 
 // Delete 删除角色
@@ -76,7 +85,7 @@ func (a *RoleController) Delete(ctx *gin.Context) {
 		result.Error[any](exception.ParamError)
 		return
 	}
-	a.RoleService.DeleteById(ctx, id).Response(ctx)
+	a.roleService.DeleteById(ctx, id).Response(ctx)
 }
 
 // AssignPermission 分配权限
@@ -96,5 +105,5 @@ func (a *RoleController) AssignPermission(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.RoleService.AssignPermission(ctx, assignModel).Response(ctx)
+	a.roleService.AssignPermission(ctx, assignModel).Response(ctx)
 }

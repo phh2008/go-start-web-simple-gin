@@ -5,13 +5,18 @@ import (
 	"com.gientech/selection/model"
 	"com.gientech/selection/pkg/orm"
 	"context"
-	"github.com/google/wire"
+	"gorm.io/gorm"
 )
 
-var UserSet = wire.NewSet(wire.Struct(new(UserDao), "*"))
-
 type UserDao struct {
-	BaseDao
+	BaseDao[entity.UserEntity]
+}
+
+// NewUserDAO 创建 userDAO
+func NewUserDAO(db *gorm.DB) *UserDao {
+	return &UserDao{
+		NewBaseDAO[entity.UserEntity](db),
+	}
 }
 
 func (a *UserDao) ListPage(ctx context.Context, req model.UserListReq) model.PageData[model.UserModel] {

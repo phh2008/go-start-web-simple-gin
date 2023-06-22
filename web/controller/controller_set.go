@@ -4,10 +4,10 @@ import (
 	"github.com/google/wire"
 )
 
-var ControllerSet = wire.NewSet(
-	HelloSet,
-	TestSet,
-	PermissionSet,
-	RoleSet,
-	UserSet,
+// ProviderSet is controller provider set
+var ProviderSet = wire.NewSet(
+	NewHelloController,
+	NewPermissionController,
+	NewRoleController,
+	NewUserController,
 )

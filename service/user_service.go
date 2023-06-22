@@ -11,28 +11,41 @@ import (
 	"context"
 	"github.com/casbin/casbin/v2"
 	"github.com/cristalhq/jwt/v5"
-	"github.com/google/wire"
 	"github.com/jinzhu/copier"
 	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"time"
 )
 
-var UserSet = wire.NewSet(wire.Struct(new(UserService), "*"))
-
+// UserService 用户服务
 type UserService struct {
-	UserDao  *dao.UserDao
-	Jwt      *xjwt.JwtHelper
-	Enforcer *casbin.Enforcer
+	userDao  *dao.UserDao
+	jwt      *xjwt.JwtHelper
+	enforcer *casbin.Enforcer
 }
 
+// NewUserService 创建服务
+func NewUserService(
+	userDao *dao.UserDao,
+	jwt *xjwt.JwtHelper,
+	enforcer *casbin.Enforcer,
+) *UserService {
+	return &UserService{
+		userDao:  userDao,
+		jwt:      jwt,
+		enforcer: enforcer,
+	}
+}
+
+// ListPage 用户列表
 func (a *UserService) ListPage(ctx context.Context, req model.UserListReq) *result.Result[model.PageData[model.UserModel]] {
-	data := a.UserDao.ListPage(ctx, req)
+	data := a.userDao.ListPage(ctx, req)
 	return result.Ok[model.PageData[model.UserModel]](data)
 }
 
+// CreateByEmail 根据邮箱创建用户
 func (a *UserService) CreateByEmail(ctx context.Context, email model.UserEmailRegister) *result.Result[model.UserModel] {
-	user := a.UserDao.GetByEmail(ctx, email.Email)
+	user := a.userDao.GetByEmail(ctx, email.Email)
 	if user.Id > 0 {
 		return result.Failure[model.UserModel]("email 已存在")
 	}
@@ -50,7 +63,7 @@ func (a *UserService) CreateByEmail(ctx context.Context, email model.UserEmailRe
 		Status:   1,
 		RoleCode: "",
 	}
-	user, err = a.UserDao.Add(ctx, user)
+	user, err = a.userDao.Add(ctx, user)
 	if err != nil {
 		logger.Errorf("创建用户出错：%s", err.Error())
 		return result.Failure[model.UserModel]("创建用户出错")
@@ -60,8 +73,9 @@ func (a *UserService) CreateByEmail(ctx context.Context, email model.UserEmailRe
 	return result.Ok[model.UserModel](userModel)
 }
 
+// LoginByEmail 邮箱登录
 func (a *UserService) LoginByEmail(ctx context.Context, loginModel model.UserLoginModel) *result.Result[string] {
-	user := a.UserDao.GetByEmail(ctx, loginModel.Email)
+	user := a.userDao.GetByEmail(ctx, loginModel.Email)
 	if user.Id == 0 {
 		return result.Failure[string]("用户或密码错误")
 	}
@@ -74,7 +88,7 @@ func (a *UserService) LoginByEmail(ctx context.Context, loginModel model.UserLog
 	userClaims.ID = strconv.FormatInt(user.Id, 10)
 	userClaims.Role = user.RoleCode
 	userClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7))
-	token, err := a.Jwt.CreateToken(userClaims)
+	token, err := a.jwt.CreateToken(userClaims)
 	if err != nil {
 		logger.Errorf("生成token错误：%s", err.Error())
 		return result.Error[string](exception.SysError)
@@ -84,29 +98,30 @@ func (a *UserService) LoginByEmail(ctx context.Context, loginModel model.UserLog
 
 // AssignRole 给用户分配角色
 func (a *UserService) AssignRole(ctx context.Context, userRole model.AssignRoleModel) *result.Result[any] {
-	err := a.UserDao.SetRole(ctx, userRole.UserId, userRole.RoleCode)
+	err := a.userDao.SetRole(ctx, userRole.UserId, userRole.RoleCode)
 	if err != nil {
 		logger.Errorf("db update error: %s", err.Error())
 		return result.Failure[any]("分配角色出错")
 	}
 	// 更新casbin中的用户与角色关系
 	uid := strconv.FormatInt(userRole.UserId, 10)
-	_, _ = a.Enforcer.DeleteRolesForUser(uid)
+	_, _ = a.enforcer.DeleteRolesForUser(uid)
 	// 角色为空，表示清除此用户的角色,无需添加
 	if userRole.RoleCode != "" {
-		_, _ = a.Enforcer.AddGroupingPolicy(uid, userRole.RoleCode)
+		_, _ = a.enforcer.AddGroupingPolicy(uid, userRole.RoleCode)
 	}
 	return result.Success[any]()
 }
 
+// DeleteById 根据ID删除
 func (a *UserService) DeleteById(ctx context.Context, id int64) *result.Result[any] {
-	err := a.UserDao.DeleteById(ctx, id)
+	err := a.userDao.DeleteById(ctx, id)
 	if err != nil {
 		logger.Errorf("delete error: %s", err.Error())
 		return result.Failure[any]("刪除出错")
 	}
 	// 清除 casbin 中用户信息
-	_, err = a.Enforcer.DeleteRolesForUser(strconv.FormatInt(id, 10))
+	_, err = a.enforcer.DeleteRolesForUser(strconv.FormatInt(id, 10))
 	if err != nil {
 		logger.Errorf("Enforcer.DeleteRolesForUser error: %s", err)
 	}

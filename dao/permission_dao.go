@@ -5,19 +5,18 @@ import (
 	"com.gientech/selection/model"
 	"com.gientech/selection/pkg/orm"
 	"context"
-	"github.com/google/wire"
+	"gorm.io/gorm"
 )
 
-var PermissionSet = wire.NewSet(wire.Struct(new(PermissionDao), "*"))
-
 type PermissionDao struct {
-	BaseDao
+	BaseDao[entity.PermissionEntity]
 }
 
-func (a *PermissionDao) GetById(ctx context.Context, id int64) entity.PermissionEntity {
-	var perm entity.PermissionEntity
-	a.GetDb(ctx).First(&perm, id)
-	return perm
+// NewPermissionDAO 创建dao
+func NewPermissionDAO(db *gorm.DB) *PermissionDao {
+	return &PermissionDao{
+		NewBaseDAO[entity.PermissionEntity](db),
+	}
 }
 
 func (a *PermissionDao) ListPage(ctx context.Context, req model.PermissionListReq) model.PageData[model.PermissionModel] {
@@ -54,7 +53,7 @@ func (a *PermissionDao) FindByIdList(idList []int64) []entity.PermissionEntity {
 	if len(idList) == 0 {
 		return list
 	}
-	db := a.Db
+	db := a.db
 	db.Find(&list, idList)
 	return list
 }

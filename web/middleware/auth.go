@@ -8,15 +8,18 @@ import (
 	"com.gientech/selection/pkg/xjwt"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"time"
 )
 
-var AuthSet = wire.NewSet(wire.Struct(new(Auth), "*"))
-
+// Auth 权限中间件
 type Auth struct {
-	Jwt      *xjwt.JwtHelper
-	Enforcer *casbin.Enforcer
+	jwt      *xjwt.JwtHelper
+	enforcer *casbin.Enforcer
+}
+
+// NewAuth 创建权限中间件
+func NewAuth(jwt *xjwt.JwtHelper, enforcer *casbin.Enforcer) *Auth {
+	return &Auth{jwt: jwt, enforcer: enforcer}
 }
 
 func (a *Auth) authValid(ctx *gin.Context) (xjwt.UserClaims, bool) {
@@ -27,13 +30,13 @@ func (a *Auth) authValid(ctx *gin.Context) (xjwt.UserClaims, bool) {
 		ctx.Abort()
 		return user, false
 	}
-	jwtToken, err := a.Jwt.VerifyToken(token)
+	jwtToken, err := a.jwt.VerifyToken(token)
 	if err != nil {
 		result.Error[any](exception.NoLogin).Response(ctx)
 		ctx.Abort()
 		return user, false
 	}
-	user, err = a.Jwt.ParseToken(jwtToken)
+	user, err = a.jwt.ParseToken(jwtToken)
 	if !user.IsValidExpiresAt(time.Now()) {
 		result.Error[any](exception.NoLogin).Response(ctx)
 		ctx.Abort()
@@ -69,7 +72,7 @@ func (a *Auth) Authorization(action string) gin.HandlerFunc {
 		if act == "" {
 			act = ctx.Request.Method
 		}
-		ok, err := a.Enforcer.Enforce(role, obj, act)
+		ok, err := a.enforcer.Enforce(role, obj, act)
 		if err != nil {
 			logger.Errorf("Enforcer.Enforce error:%s", err.Error())
 			// 鉴权出错了

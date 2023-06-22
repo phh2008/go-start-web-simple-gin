@@ -4,10 +4,10 @@ import (
 	"github.com/google/wire"
 )
 
-var ServiceSet = wire.NewSet(
-	TestSet,
-	PermissionSet,
-	RolePermissionSet,
-	RoleSet,
-	UserSet,
+// ProviderSet is service provider set
+var ProviderSet = wire.NewSet(
+	NewPermissionService,
+	NewRolePermissionService,
+	NewRoleService,
+	NewUserService,
 )

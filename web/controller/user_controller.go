@@ -6,14 +6,17 @@ import (
 	"com.gientech/selection/pkg/xgin"
 	"com.gientech/selection/service"
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"strconv"
 )
 
-var UserSet = wire.NewSet(wire.Struct(new(UserController), "*"))
-
+// UserController 用户 api
 type UserController struct {
-	UserService *service.UserService
+	userService *service.UserService
+}
+
+// NewUserController 创建用户 api
+func NewUserController(userService *service.UserService) *UserController {
+	return &UserController{userService: userService}
 }
 
 // List 用户管理列表
@@ -33,7 +36,7 @@ func (a *UserController) List(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.UserService.ListPage(ctx, req).Response(ctx)
+	a.userService.ListPage(ctx, req).Response(ctx)
 }
 
 // CreateByEmail 创建用户
@@ -52,7 +55,7 @@ func (a *UserController) CreateByEmail(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	res := a.UserService.CreateByEmail(ctx, email)
+	res := a.userService.CreateByEmail(ctx, email)
 	res.Response(ctx)
 }
 
@@ -72,7 +75,7 @@ func (a *UserController) Login(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.UserService.LoginByEmail(ctx, logModel).Response(ctx)
+	a.userService.LoginByEmail(ctx, logModel).Response(ctx)
 }
 
 // AssignRole 给用户分配角色
@@ -92,7 +95,7 @@ func (a *UserController) AssignRole(ctx *gin.Context) {
 		result.Error[any](err).Response(ctx)
 		return
 	}
-	a.UserService.AssignRole(ctx, userRole).Response(ctx)
+	a.userService.AssignRole(ctx, userRole).Response(ctx)
 }
 
 // DeleteById 刪除用戶
@@ -113,5 +116,5 @@ func (a *UserController) DeleteById(ctx *gin.Context) {
 		result.Failure[any]("参数错误").Response(ctx)
 		return
 	}
-	a.UserService.DeleteById(ctx, id).Response(ctx)
+	a.userService.DeleteById(ctx, id).Response(ctx)
 }
