@@ -9,10 +9,11 @@ import (
 	"github.com/google/wire"
 )
 
-var ToolSet = wire.NewSet(
-	config.ConfigSet,
-	logger.LoggerSet,
-	orm.InitDB,
+// ProviderSet is pkg provider set
+var ProviderSet = wire.NewSet(
+	config.NewConfig,
+	logger.NewLogger,
+	orm.NewDB,
 	xjwt.NewJwtHelper,
 	xcasbin.NewCasbin,
 )

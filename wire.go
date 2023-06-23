@@ -20,7 +20,7 @@ import (
 
 func BuildServer(configFolder config.ConfigFolder) *app.Server {
 	wire.Build(
-		pkg.ToolSet,
+		pkg.ProviderSet,
 		dao.ProviderSet,
 		service.ProviderSet,
 		controller.ProviderSet,

@@ -2,12 +2,9 @@ package config
 
 import (
 	"github.com/fsnotify/fsnotify"
-	"github.com/google/wire"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
-
-var ConfigSet = wire.NewSet(NewConfig)
 
 // Env 当前环境，比如：dev，测会加载 config-dev.yml的配置
 var Env string

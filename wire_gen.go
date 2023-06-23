@@ -25,8 +25,8 @@ import (
 
 func BuildServer(configFolder config.ConfigFolder) *app.Server {
 	configConfig := config.NewConfig(configFolder)
-	db := orm.InitDB(configConfig)
-	zapLogger := logger.InitLogger(configConfig)
+	db := orm.NewDB(configConfig)
+	zapLogger := logger.NewLogger(configConfig)
 	engine := gin.New()
 	helloController := controller.NewHelloController()
 	jwtHelper := xjwt.NewJwtHelper(configConfig)

@@ -2,7 +2,6 @@ package logger
 
 import (
 	"com.gientech/selection/pkg/config"
-	"github.com/google/wire"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -11,8 +10,6 @@ import (
 	"strings"
 	"time"
 )
-
-var LoggerSet = wire.NewSet(InitLogger)
 
 var log *zap.Logger = zap.L()
 var slog *zap.SugaredLogger = log.Sugar()
@@ -26,7 +23,8 @@ var levelMap = map[string]zapcore.Level{
 	"error": zapcore.ErrorLevel,
 }
 
-func InitLogger(config *config.Config) *zap.Logger {
+// NewLogger 创建 logger
+func NewLogger(config *config.Config) *zap.Logger {
 	log = newZapLog(config)
 	slog = log.Sugar()
 	// 替换 zap 全局 log

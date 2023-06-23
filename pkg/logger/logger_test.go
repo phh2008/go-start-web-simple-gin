@@ -19,7 +19,7 @@ func TestZap(t *testing.T) {
 
 func TestLogger(t *testing.T) {
 	var config = config.NewConfig("../../config")
-	InitLogger(config)
+	NewLogger(config)
 	S().Debugf("debug message")
 	S().Infof("info message")
 	S().Warnf("warn message")
@@ -30,7 +30,7 @@ func TestLogger(t *testing.T) {
 
 func TestWrapLogger(t *testing.T) {
 	var config = config.NewConfig("../../config")
-	InitLogger(config)
+	NewLogger(config)
 
 	Debugf("wrap debugF message %s %s %s", "aa", "bb", "cc")
 	Infof("wrap infoF message")

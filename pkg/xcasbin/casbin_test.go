@@ -12,7 +12,7 @@ var enforcer *casbin.Enforcer
 
 func init() {
 	config := config.NewConfig("../.././config")
-	db := orm.InitDB(config)
+	db := orm.NewDB(config)
 	enforcer = NewCasbin(db, config)
 }
 

@@ -10,7 +10,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func InitDB(config *config.Config) *gorm.DB {
+// NewDB 创建 gorm.DB
+func NewDB(config *config.Config) *gorm.DB {
 	var dsn = config.Viper.GetString("db.url")
 	var gdb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
