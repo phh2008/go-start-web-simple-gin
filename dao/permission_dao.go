@@ -21,7 +21,7 @@ func NewPermissionDAO(db *gorm.DB) *PermissionDao {
 
 func (a *PermissionDao) ListPage(ctx context.Context, req model.PermissionListReq) model.PageData[model.PermissionModel] {
 	db := a.GetDb(ctx)
-	db = db.Model(&entity.UserEntity{})
+	db = db.Model(&entity.PermissionEntity{})
 	if req.PermName != "" {
 		db = db.Where("perm_name like ?", "%"+req.PermName+"%")
 	}

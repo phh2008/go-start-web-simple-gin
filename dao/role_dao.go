@@ -22,7 +22,7 @@ func NewRoleDAO(db *gorm.DB) *RoleDao {
 
 func (a *RoleDao) ListPage(ctx context.Context, req model.RoleListReq) model.PageData[model.RoleModel] {
 	db := a.GetDb(ctx)
-	db = db.Model(&entity.UserEntity{})
+	db = db.Model(&entity.RoleEntity{})
 	if req.RoleCode != "" {
 		db = db.Where("role_code like ?", "%"+req.RoleCode+"%")
 	}
