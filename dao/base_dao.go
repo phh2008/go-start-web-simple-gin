@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"com.gientech/selection/entity"
 	"context"
 	"gorm.io/gorm"
 )
@@ -56,7 +55,7 @@ func (a *BaseDao[T]) Update(ctx context.Context, entity T) (T, error) {
 
 // DeleteById 根据ID删除
 func (a *BaseDao[T]) DeleteById(ctx context.Context, id int64) error {
-	db := a.GetDb(ctx).Delete(&entity.UserEntity{}, id)
+	db := a.GetDb(ctx).Delete(new(T), id)
 	return db.Error
 }
 
