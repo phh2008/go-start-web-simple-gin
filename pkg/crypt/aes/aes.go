@@ -1,57 +1,73 @@
-package main
+package aes
 
 import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/base64"
 )
 
-// Encrypt 加密 aes_128_cbc
-func Encrypt(encryptStr string, key []byte, iv string) (string, error) {
-	encryptBytes := []byte(encryptStr)
-	block, err := aes.NewCipher(key)
+// AesECBEncrypt
+func AesECBEncrypt(src, key []byte, padding string) ([]byte, error) {
+	block, err := AesNewCipher(key)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-
-	blockSize := block.BlockSize()
-	encryptBytes = pkcs5Padding(encryptBytes, blockSize)
-
-	blockMode := cipher.NewCBCEncrypter(block, []byte(iv))
-	encrypted := make([]byte, len(encryptBytes))
-	blockMode.CryptBlocks(encrypted, encryptBytes)
-	return base64.URLEncoding.EncodeToString(encrypted), nil
+	return ECBEncrypt(block, src, padding)
 }
 
-// Decrypt 解密
-func Decrypt(decryptStr string, key []byte, iv string) (string, error) {
-	decryptBytes, err := base64.URLEncoding.DecodeString(decryptStr)
+// AesECBDecrypt
+func AesECBDecrypt(src, key []byte, padding string) ([]byte, error) {
+	block, err := AesNewCipher(key)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	block, err := aes.NewCipher(key)
+	return ECBDecrypt(block, src, padding)
+}
+
+// AesCBCEncrypt
+func AesCBCEncrypt(src, key, iv []byte, padding string) ([]byte, error) {
+	block, err := AesNewCipher(key)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	blockMode := cipher.NewCBCDecrypter(block, []byte(iv))
-	decrypted := make([]byte, len(decryptBytes))
-
-	blockMode.CryptBlocks(decrypted, decryptBytes)
-	decrypted = pkcs5UnPadding(decrypted)
-	return string(decrypted), nil
+	return CBCEncrypt(block, src, iv, padding)
 }
 
-func pkcs5Padding(cipherText []byte, blockSize int) []byte {
-	padding := blockSize - len(cipherText)%blockSize
-	padText := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(cipherText, padText...)
+// AesCBCDecrypt
+func AesCBCDecrypt(src, key, iv []byte, padding string) ([]byte, error) {
+	block, err := AesNewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return CBCDecrypt(block, src, iv, padding)
 }
 
-func pkcs5UnPadding(decrypted []byte) []byte {
-	length := len(decrypted)
-	unPadding := int(decrypted[length-1])
-	return decrypted[:(length - unPadding)]
+// AesNewCipher creates and returns a new AES cipher.Block.
+// it will automatically pad the length of the key.
+func AesNewCipher(key []byte) (cipher.Block, error) {
+	return aes.NewCipher(aesKeyPending(key))
+}
+
+// aesKeyPending The length of the key can be 16/24/32 characters (128/192/256 bits)
+func aesKeyPending(key []byte) []byte {
+	k := len(key)
+	count := 0
+	switch true {
+	case k <= 16:
+		count = 16 - k
+	case k <= 24:
+		count = 24 - k
+	case k <= 32:
+		count = 32 - k
+	default:
+		return key[:32]
+	}
+	if count == 0 {
+		return key
+	}
+
+	return append(key, bytes.Repeat([]byte{0}, count)...)
 }

@@ -7,7 +7,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/hex"
 	"errors"
 	"runtime"
 )
@@ -93,8 +92,8 @@ func rsaDecrypt(cipherText, privateKey []byte) (plainText []byte, err error) {
 	return plainText, nil
 }
 
-// EncryptToBase64 加密 to base64
-func EncryptToBase64(plainText []byte, base64PubKey string) (base64CipherText string, err error) {
+// EncryptByPubKey 加密
+func EncryptByPubKey(plainText []byte, base64PubKey string) (base64CipherText string, err error) {
 	pub, err := base64.StdEncoding.DecodeString(base64PubKey)
 	if err != nil {
 		return "", err
@@ -106,39 +105,13 @@ func EncryptToBase64(plainText []byte, base64PubKey string) (base64CipherText st
 	return base64.StdEncoding.EncodeToString(cipherBytes), nil
 }
 
-// DecryptByBase64 解密 by base64
-func DecryptByBase64(base64CipherText, base64PriKey string) (plainText []byte, err error) {
+// DecryptByPriKey 解密
+func DecryptByPriKey(base64CipherText, base64PriKey string) (plainText []byte, err error) {
 	privateBytes, err := base64.StdEncoding.DecodeString(base64PriKey)
 	if err != nil {
 		return nil, err
 	}
 	cipherTextBytes, err := base64.StdEncoding.DecodeString(base64CipherText)
-	if err != nil {
-		return nil, err
-	}
-	return rsaDecrypt(cipherTextBytes, privateBytes)
-}
-
-// EncryptToHex 加密 to hex
-func EncryptToHex(plainText []byte, hexPubKey string) (hexCipherText string, err error) {
-	pub, err := hex.DecodeString(hexPubKey)
-	if err != nil {
-		return "", err
-	}
-	cipherBytes, err := rsaEncrypt(plainText, pub)
-	if err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(cipherBytes), nil
-}
-
-// DecryptByHex 解密 by hex
-func DecryptByHex(hexCipherText, hexPriKey string) (plainText []byte, err error) {
-	privateBytes, err := hex.DecodeString(hexPriKey)
-	if err != nil {
-		return nil, err
-	}
-	cipherTextBytes, err := hex.DecodeString(hexCipherText)
 	if err != nil {
 		return nil, err
 	}
