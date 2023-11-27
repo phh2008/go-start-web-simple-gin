@@ -3,18 +3,17 @@ package rsa
 import (
 	"bytes"
 	"com.gientech/selection/pkg/logger"
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/pem"
 	"errors"
 	"runtime"
 )
 
-// ErrRsaBits error bits 1024 or 2048
-var ErrRsaBits = errors.New("bits 1024 or 2048")
-
-func rsaEncrypt(plainText, publicKey []byte) (cipherText []byte, err error) {
+func encryptByPublicKey(plainText, publicKey []byte) (cipherText []byte, err error) {
 	defer func() {
 		if err := recover(); err != nil {
 			switch err.(type) {
@@ -25,21 +24,19 @@ func rsaEncrypt(plainText, publicKey []byte) (cipherText []byte, err error) {
 			}
 		}
 	}()
-	pub, err := x509.ParsePKCS1PublicKey(publicKey)
+	block, _ := pem.Decode(publicKey)
+	if block == nil {
+		return nil, errors.New("key is invalid format")
+	}
+	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
-	pubSize, plainTextSize := pub.Size(), len(plainText)
-	// EncryptPKCS1v15 encrypts the given message with RSA and the padding
-	// scheme from PKCS #1 v1.5.  The message must be no longer than the
-	// length of the public modulus minus 11 bytes.
-	//
-	// The rand parameter is used as a source of entropy to ensure that
-	// encrypting the same message twice doesn't result in the same
-	// ciphertext.
-	//
-	// WARNING: use of this function to encrypt plaintexts other than
-	// session keys is dangerous. Use RSA OAEP in new protocols.
+	pk, ok := pubKey.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("the kind of key is not a rsa.PublicKey")
+	}
+	pubSize, plainTextSize := pk.Size(), len(plainText)
 	offSet, once := 0, pubSize-11
 	buffer := bytes.Buffer{}
 	for offSet < plainTextSize {
@@ -47,7 +44,7 @@ func rsaEncrypt(plainText, publicKey []byte) (cipherText []byte, err error) {
 		if endIndex > plainTextSize {
 			endIndex = plainTextSize
 		}
-		bytesOnce, err := rsa.EncryptPKCS1v15(rand.Reader, pub, plainText[offSet:endIndex])
+		bytesOnce, err := rsa.EncryptPKCS1v15(rand.Reader, pk, plainText[offSet:endIndex])
 		if err != nil {
 			return nil, err
 		}
@@ -58,7 +55,7 @@ func rsaEncrypt(plainText, publicKey []byte) (cipherText []byte, err error) {
 	return cipherText, nil
 }
 
-func rsaDecrypt(cipherText, privateKey []byte) (plainText []byte, err error) {
+func decryptByPrivateKey(cipherText, privateKey []byte) (plainText []byte, err error) {
 	defer func() {
 		if err := recover(); err != nil {
 			switch err.(type) {
@@ -69,11 +66,16 @@ func rsaDecrypt(cipherText, privateKey []byte) (plainText []byte, err error) {
 			}
 		}
 	}()
-	pri, err := x509.ParsePKCS1PrivateKey(privateKey)
+	block, _ := pem.Decode(privateKey)
+	if block == nil {
+		return nil, errors.New("key is invalid format")
+	}
+	pri, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return []byte{}, err
 	}
-	priSize, cipherTextSize := pri.Size(), len(cipherText)
+	pk := pri.(*rsa.PrivateKey)
+	priSize, cipherTextSize := pk.Size(), len(cipherText)
 	var offSet = 0
 	var buffer = bytes.Buffer{}
 	for offSet < cipherTextSize {
@@ -81,7 +83,7 @@ func rsaDecrypt(cipherText, privateKey []byte) (plainText []byte, err error) {
 		if endIndex > cipherTextSize {
 			endIndex = cipherTextSize
 		}
-		bytesOnce, err := rsa.DecryptPKCS1v15(rand.Reader, pri, cipherText[offSet:endIndex])
+		bytesOnce, err := rsa.DecryptPKCS1v15(rand.Reader, pk, cipherText[offSet:endIndex])
 		if err != nil {
 			return nil, err
 		}
@@ -93,12 +95,8 @@ func rsaDecrypt(cipherText, privateKey []byte) (plainText []byte, err error) {
 }
 
 // EncryptByPubKey 加密
-func EncryptByPubKey(plainText []byte, base64PubKey string) (base64CipherText string, err error) {
-	pub, err := base64.StdEncoding.DecodeString(base64PubKey)
-	if err != nil {
-		return "", err
-	}
-	cipherBytes, err := rsaEncrypt(plainText, pub)
+func EncryptByPubKey(plainText []byte, pubKey []byte) (base64CipherText string, err error) {
+	cipherBytes, err := encryptByPublicKey(plainText, pubKey)
 	if err != nil {
 		return "", err
 	}
@@ -106,14 +104,55 @@ func EncryptByPubKey(plainText []byte, base64PubKey string) (base64CipherText st
 }
 
 // DecryptByPriKey 解密
-func DecryptByPriKey(base64CipherText, base64PriKey string) (plainText []byte, err error) {
-	privateBytes, err := base64.StdEncoding.DecodeString(base64PriKey)
+func DecryptByPriKey(cipherTextBytes []byte, priKey []byte) (plainText []byte, err error) {
+	return decryptByPrivateKey(cipherTextBytes, priKey)
+}
+
+// CreateSign RSA sign
+func CreateSign(src []byte, priKey []byte, hash crypto.Hash) ([]byte, error) {
+	block, _ := pem.Decode(priKey)
+	if block == nil {
+		return nil, errors.New("key is invalid format")
+	}
+	// x509 parse
+	privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
-	cipherTextBytes, err := base64.StdEncoding.DecodeString(base64CipherText)
+	pk := privateKey.(*rsa.PrivateKey)
+	h := hash.New()
+	_, err = h.Write(src)
 	if err != nil {
 		return nil, err
 	}
-	return rsaDecrypt(cipherTextBytes, privateBytes)
+	bt := h.Sum(nil)
+	sign, err := rsa.SignPKCS1v15(rand.Reader, pk, hash, bt)
+	if err != nil {
+		return nil, err
+	}
+	return sign, nil
+}
+
+// VerifySign RSA verify
+func VerifySign(src, sign, pubKey []byte, hash crypto.Hash) error {
+	block, _ := pem.Decode(pubKey)
+	if block == nil {
+		return errors.New("key is invalid format")
+	}
+	// x509 parse
+	publicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return err
+	}
+	publicKey, ok := publicKeyInterface.(*rsa.PublicKey)
+	if !ok {
+		return errors.New("the kind of key is not a rsa.PublicKey")
+	}
+	h := hash.New()
+	_, err = h.Write(src)
+	if err != nil {
+		return err
+	}
+	bt := h.Sum(nil)
+	return rsa.VerifyPKCS1v15(publicKey, hash, bt, sign)
 }

@@ -4,42 +4,42 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/base64"
-	"encoding/hex"
+	"encoding/pem"
+	"errors"
+	"io"
 )
 
-// Key 密钥对
-type Key struct {
-	PrivateKey string
-	PublicKey  string
-}
-
-// GenerateRsaKeyHex 生成 rsa key, bits is 1024 or 2048
-func GenerateRsaKeyHex(bits int) (Key, error) {
-	if bits != 1024 && bits != 2048 {
-		return Key{}, ErrRsaBits
-	}
+// GeneratePrivateKey generate RSA private key
+func GeneratePrivateKey(bits int, out io.Writer) error {
 	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
 	if err != nil {
-		return Key{}, err
+		return err
 	}
-	return Key{
-		PrivateKey: hex.EncodeToString(x509.MarshalPKCS1PrivateKey(privateKey)),
-		PublicKey:  hex.EncodeToString(x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)),
-	}, nil
+	X509PrivateKey, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return errors.New("MarshalPKCS8PrivateKey error")
+	}
+	privateBlock := pem.Block{Type: "PRIVATE KEY", Bytes: X509PrivateKey}
+	return pem.Encode(out, &privateBlock)
 }
 
-// GenerateRsaKeyBase64 生成 rsa key, bits is 1024 or 2048
-func GenerateRsaKeyBase64(bits int) (Key, error) {
-	if bits != 1024 && bits != 2048 {
-		return Key{}, ErrRsaBits
+// GeneratePublicKey generate RSA public key
+func GeneratePublicKey(priKey []byte, out io.Writer) error {
+	block, _ := pem.Decode(priKey)
+	if block == nil {
+		return errors.New("key is invalid format")
 	}
-	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
+	// x509 parse
+	privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
-		return Key{}, err
+		return err
 	}
-	return Key{
-		PrivateKey: base64.StdEncoding.EncodeToString(x509.MarshalPKCS1PrivateKey(privateKey)),
-		PublicKey:  base64.StdEncoding.EncodeToString(x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)),
-	}, nil
+	pk := privateKey.(*rsa.PrivateKey)
+	//publicKey := privateKey.PublicKey
+	X509PublicKey, err := x509.MarshalPKIXPublicKey(&pk.PublicKey)
+	if err != nil {
+		return err
+	}
+	publicBlock := pem.Block{Type: "PUBLIC KEY", Bytes: X509PublicKey}
+	return pem.Encode(out, &publicBlock)
 }
