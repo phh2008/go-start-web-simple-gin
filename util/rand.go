@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/google/uuid"
 	"math/rand"
 	"strconv"
 	"time"
@@ -44,4 +45,10 @@ func RandStr(n int) string {
 		remain--
 	}
 	return string(b)
+}
+
+// UUID 生成UUID
+func UUID() string {
+	u, _ := uuid.NewUUID()
+	return u.String()
 }
