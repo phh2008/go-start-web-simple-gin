@@ -36,8 +36,8 @@ func OrderScope(field string, direct string) func(db *gorm.DB) *gorm.DB {
 		// 非法字段
 		return emptyScope()
 	}
-	if !util.DirectReg.MatchString(direct) {
-		return emptyScope()
+	if direct == "" || !util.DirectReg.MatchString(direct) {
+		direct = "asc"
 	}
 	sort := fmt.Sprintf("%s %s", field, direct)
 	return func(db *gorm.DB) *gorm.DB {
@@ -58,7 +58,13 @@ func PageScope(pageNo, pageSize int) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-func QueryPageData[T any](db *gorm.DB, pageNo, pageSize int) (model.PageData[T], *gorm.DB) {
+// QueryPage 分页查询
+func QueryPage[T any](db *gorm.DB, pageNo, pageSize int) (model.PageData[T], error) {
+	return QueryOrderPage[T](db, "", "", pageNo, pageSize)
+}
+
+// QueryOrderPage 排序分页查询
+func QueryOrderPage[T any](db *gorm.DB, sortField string, direct string, pageNo, pageSize int) (model.PageData[T], error) {
 	if pageNo <= 0 {
 		pageNo = 1
 	}
@@ -69,6 +75,6 @@ func QueryPageData[T any](db *gorm.DB, pageNo, pageSize int) (model.PageData[T],
 	pageData.PageNo = pageNo
 	pageData.PageSize = pageSize
 	offset := (pageNo - 1) * pageSize
-	newDb := db.Count(&pageData.Count).Offset(offset).Limit(pageSize).Find(&pageData.Data)
-	return pageData, newDb
+	err := db.Count(&pageData.Count).Scopes(OrderScope(sortField, direct)).Offset(offset).Limit(pageSize).Find(&pageData.Data).Error
+	return pageData, err
 }

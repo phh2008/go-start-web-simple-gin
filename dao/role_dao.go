@@ -29,7 +29,7 @@ func (a *RoleDao) ListPage(ctx context.Context, req model.RoleListReq) model.Pag
 	if req.RoleName != "" {
 		db = db.Where("role_name like ?", "%"+req.RoleName+"%")
 	}
-	pageData, db := orm.QueryPageData[model.RoleModel](db, req.GetPageNo(), req.GetPageSize())
+	pageData, _ := orm.QueryPage[model.RoleModel](db, req.GetPageNo(), req.GetPageSize())
 	return pageData
 }
 

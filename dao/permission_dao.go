@@ -34,7 +34,7 @@ func (a *PermissionDao) ListPage(ctx context.Context, req model.PermissionListRe
 	if req.PermType != 0 {
 		db = db.Where("perm_type=?", req.PermType)
 	}
-	pageData, db := orm.QueryPageData[model.PermissionModel](db, req.GetPageNo(), req.GetPageSize())
+	pageData, _ := orm.QueryPage[model.PermissionModel](db, req.GetPageNo(), req.GetPageSize())
 	return pageData
 }
 
