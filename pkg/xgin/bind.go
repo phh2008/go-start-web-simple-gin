@@ -2,6 +2,8 @@ package xgin
 
 import (
 	"com.gientech/selection/pkg/validate"
+	"errors"
+	"github.com/gin-gonic/gin/binding"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -72,8 +74,12 @@ func TranslateValidationError(c *gin.Context, err error) (bool, ValidErrors) {
 	if !ok || trans == nil {
 		trans = validate.Trans
 	}
-	validErrs, ok := err.(val.ValidationErrors)
-	if !ok {
+	var validErrs val.ValidationErrors
+	var sliceErrs binding.SliceValidationError
+	if errors.As(err, &sliceErrs) {
+		err = sliceErrs[0]
+	}
+	if !errors.As(err, &validErrs) {
 		errs = append(errs, &ValidError{
 			Key:     "",
 			Message: err.Error(),
