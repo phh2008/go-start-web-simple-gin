@@ -7,25 +7,25 @@ import (
 	"encoding/base64"
 )
 
-// AesGCM aes gcm
-type AesGCM struct {
+// GCM aes gcm
+type GCM struct {
 	Key []byte
 	IV  []byte
 }
 
-// NewAesGCM new aes gcm
-func NewAesGCM(key []byte, iv ...byte) *AesGCM {
+// NewGCM new aes gcm
+func NewGCM(key []byte, iv ...byte) *GCM {
 	if len(iv) == 0 {
 		iv = key[:12]
 	}
-	return &AesGCM{
+	return &GCM{
 		Key: key,
 		IV:  iv,
 	}
 }
 
 // encrypt 加密
-func (obj *AesGCM) encrypt(plainText []byte, withIV bool) ([]byte, error) {
+func (obj *GCM) encrypt(plainText []byte, withIV bool) ([]byte, error) {
 	if len(obj.Key) != 16 && len(obj.Key) != 24 && len(obj.Key) != 32 {
 		return nil, crypt.ErrKeyLength
 	}
@@ -35,12 +35,12 @@ func (obj *AesGCM) encrypt(plainText []byte, withIV bool) ([]byte, error) {
 		return nil, err
 	}
 
-	aesgcm, err := cipher.NewGCM(block)
+	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
 	}
-	if len(obj.IV) != aesgcm.NonceSize() {
-		aesgcm, err = cipher.NewGCMWithNonceSize(block, len(obj.IV))
+	if len(obj.IV) != gcm.NonceSize() {
+		gcm, err = cipher.NewGCMWithNonceSize(block, len(obj.IV))
 		if err != nil {
 			return nil, err
 		}
@@ -48,26 +48,26 @@ func (obj *AesGCM) encrypt(plainText []byte, withIV bool) ([]byte, error) {
 
 	var cipherText []byte
 	if withIV {
-		cipherText = aesgcm.Seal(obj.IV, obj.IV, plainText, nil)
+		cipherText = gcm.Seal(obj.IV, obj.IV, plainText, nil)
 	} else {
-		cipherText = aesgcm.Seal(nil, obj.IV, plainText, nil)
+		cipherText = gcm.Seal(nil, obj.IV, plainText, nil)
 	}
 
 	return cipherText, nil
 }
 
 // EncryptWithIV 加密,带有iv前缀
-func (obj *AesGCM) EncryptWithIV(plainText []byte) ([]byte, error) {
+func (obj *GCM) EncryptWithIV(plainText []byte) ([]byte, error) {
 	return obj.encrypt(plainText, true)
 }
 
 // Encrypt 加密，无前缀
-func (obj *AesGCM) Encrypt(plainText []byte) ([]byte, error) {
+func (obj *GCM) Encrypt(plainText []byte) ([]byte, error) {
 	return obj.encrypt(plainText, false)
 }
 
 // EncryptBase64WithIV 加密base64，带iv前缀
-func (obj *AesGCM) EncryptBase64WithIV(plainText []byte) (string, error) {
+func (obj *GCM) EncryptBase64WithIV(plainText []byte) (string, error) {
 	cipherText, err := obj.EncryptWithIV(plainText)
 	if err != nil {
 		return "", err
@@ -77,7 +77,7 @@ func (obj *AesGCM) EncryptBase64WithIV(plainText []byte) (string, error) {
 }
 
 // EncryptBase64 加密base64
-func (obj *AesGCM) EncryptBase64(plainText []byte) (string, error) {
+func (obj *GCM) EncryptBase64(plainText []byte) (string, error) {
 	cipherText, err := obj.Encrypt(plainText)
 	if err != nil {
 		return "", err
@@ -87,7 +87,7 @@ func (obj *AesGCM) EncryptBase64(plainText []byte) (string, error) {
 }
 
 // decrypt 解密
-func (obj *AesGCM) decrypt(cipherText []byte, withIV bool) ([]byte, error) {
+func (obj *GCM) decrypt(cipherText []byte, withIV bool) ([]byte, error) {
 	if len(obj.Key) != 16 && len(obj.Key) != 24 && len(obj.Key) != 32 {
 		return nil, crypt.ErrKeyLength
 	}
@@ -99,12 +99,12 @@ func (obj *AesGCM) decrypt(cipherText []byte, withIV bool) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	aesgcm, err := cipher.NewGCM(block)
+	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
 	}
-	if len(obj.IV) != aesgcm.NonceSize() {
-		aesgcm, err = cipher.NewGCMWithNonceSize(block, len(obj.IV))
+	if len(obj.IV) != gcm.NonceSize() {
+		gcm, err = cipher.NewGCMWithNonceSize(block, len(obj.IV))
 		if err != nil {
 			return nil, err
 		}
@@ -112,10 +112,10 @@ func (obj *AesGCM) decrypt(cipherText []byte, withIV bool) ([]byte, error) {
 
 	var plainText []byte
 	if withIV {
-		iv, cipherText := cipherText[:aesgcm.NonceSize()], cipherText[aesgcm.NonceSize():]
-		plainText, err = aesgcm.Open(nil, iv, cipherText, nil)
+		iv, cipherText := cipherText[:gcm.NonceSize()], cipherText[gcm.NonceSize():]
+		plainText, err = gcm.Open(nil, iv, cipherText, nil)
 	} else {
-		plainText, err = aesgcm.Open(nil, obj.IV, cipherText, nil)
+		plainText, err = gcm.Open(nil, obj.IV, cipherText, nil)
 	}
 	if err != nil {
 		return nil, err
@@ -125,17 +125,17 @@ func (obj *AesGCM) decrypt(cipherText []byte, withIV bool) ([]byte, error) {
 }
 
 // DecryptWithIV 解密，带有iv前缀
-func (obj *AesGCM) DecryptWithIV(cipherText []byte) ([]byte, error) {
+func (obj *GCM) DecryptWithIV(cipherText []byte) ([]byte, error) {
 	return obj.decrypt(cipherText, true)
 }
 
 // Decrypt 解密
-func (obj *AesGCM) Decrypt(cipherText []byte) ([]byte, error) {
+func (obj *GCM) Decrypt(cipherText []byte) ([]byte, error) {
 	return obj.decrypt(cipherText, false)
 }
 
 // DecryptBase64WithIV 解密base64，带有iv前缀
-func (obj *AesGCM) DecryptBase64WithIV(cipherStr string) ([]byte, error) {
+func (obj *GCM) DecryptBase64WithIV(cipherStr string) ([]byte, error) {
 	cipherText, err := base64.StdEncoding.DecodeString(cipherStr)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (obj *AesGCM) DecryptBase64WithIV(cipherStr string) ([]byte, error) {
 }
 
 // DecryptBase64 解密base64
-func (obj *AesGCM) DecryptBase64(cipherStr string) ([]byte, error) {
+func (obj *GCM) DecryptBase64(cipherStr string) ([]byte, error) {
 	cipherText, err := base64.StdEncoding.DecodeString(cipherStr)
 	if err != nil {
 		return nil, err

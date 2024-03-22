@@ -6,48 +6,39 @@ import (
 	"crypto/cipher"
 )
 
-// AesECBEncrypt
-func AesECBEncrypt(src, key []byte, padding string) ([]byte, error) {
-	block, err := AesNewCipher(key)
+func ECBEncrypt(src, key []byte, padding string) ([]byte, error) {
+	block, err := NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-	return ECBEncrypt(block, src, padding)
+	return ecbEncrypt(block, src, padding)
 }
 
-// AesECBDecrypt
-func AesECBDecrypt(src, key []byte, padding string) ([]byte, error) {
-	block, err := AesNewCipher(key)
+func ECBDecrypt(src, key []byte, padding string) ([]byte, error) {
+	block, err := NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-
-	return ECBDecrypt(block, src, padding)
+	return ecbDecrypt(block, src, padding)
 }
 
-// AesCBCEncrypt
-func AesCBCEncrypt(src, key, iv []byte, padding string) ([]byte, error) {
-	block, err := AesNewCipher(key)
+func CBCEncrypt(src, key, iv []byte, padding string) ([]byte, error) {
+	block, err := NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-
-	return CBCEncrypt(block, src, iv, padding)
+	return cbcEncrypt(block, src, iv, padding)
 }
 
-// AesCBCDecrypt
-func AesCBCDecrypt(src, key, iv []byte, padding string) ([]byte, error) {
-	block, err := AesNewCipher(key)
+func CBCDecrypt(src, key, iv []byte, padding string) ([]byte, error) {
+	block, err := NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-
-	return CBCDecrypt(block, src, iv, padding)
+	return cbcDecrypt(block, src, iv, padding)
 }
 
-// AesNewCipher creates and returns a new AES cipher.Block.
-// it will automatically pad the length of the key.
-func AesNewCipher(key []byte) (cipher.Block, error) {
+func NewCipher(key []byte) (cipher.Block, error) {
 	return aes.NewCipher(aesKeyPending(key))
 }
 
@@ -68,6 +59,5 @@ func aesKeyPending(key []byte) []byte {
 	if count == 0 {
 		return key
 	}
-
 	return append(key, bytes.Repeat([]byte{0}, count)...)
 }

@@ -5,8 +5,7 @@ import (
 	"crypto/cipher"
 )
 
-// CBCEncrypt
-func CBCEncrypt(block cipher.Block, src, iv []byte, padding string) ([]byte, error) {
+func cbcEncrypt(block cipher.Block, src, iv []byte, padding string) ([]byte, error) {
 	blockSize := block.BlockSize()
 	src = Padding(padding, src, blockSize)
 
@@ -15,7 +14,7 @@ func CBCEncrypt(block cipher.Block, src, iv []byte, padding string) ([]byte, err
 	if len(iv) != block.BlockSize() {
 		// auto pad length to block size
 		iv = cbcIVPending(iv, block.BlockSize())
-		//return nil, errors.New("CBCEncrypt: IV length must equal block size")
+		//return nil, errors.New("cbcEncrypt: IV length must equal block size")
 	}
 
 	mode := cipher.NewCBCEncrypter(block, iv)
@@ -24,15 +23,14 @@ func CBCEncrypt(block cipher.Block, src, iv []byte, padding string) ([]byte, err
 	return encryptData, nil
 }
 
-// CBCDecrypt
-func CBCDecrypt(block cipher.Block, src, iv []byte, padding string) ([]byte, error) {
+func cbcDecrypt(block cipher.Block, src, iv []byte, padding string) ([]byte, error) {
 
 	dst := make([]byte, len(src))
 
 	if len(iv) != block.BlockSize() {
 		// auto pad length to block size
 		iv = cbcIVPending(iv, block.BlockSize())
-		//return nil, errors.New("CBCDecrypt: IV length must equal block size")
+		//return nil, errors.New("cbcDecrypt: IV length must equal block size")
 	}
 
 	mode := cipher.NewCBCDecrypter(block, iv)

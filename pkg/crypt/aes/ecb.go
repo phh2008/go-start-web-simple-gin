@@ -4,7 +4,7 @@ import (
 	"crypto/cipher"
 )
 
-func ECBEncrypt(block cipher.Block, src []byte, padding string) ([]byte, error) {
+func ecbEncrypt(block cipher.Block, src []byte, padding string) ([]byte, error) {
 	blockSize := block.BlockSize()
 	src = Padding(padding, src, blockSize)
 
@@ -16,7 +16,7 @@ func ECBEncrypt(block cipher.Block, src []byte, padding string) ([]byte, error) 
 	return encryptData, nil
 }
 
-func ECBDecrypt(block cipher.Block, src []byte, padding string) ([]byte, error) {
+func ecbDecrypt(block cipher.Block, src []byte, padding string) ([]byte, error) {
 	dst := make([]byte, len(src))
 
 	mode := NewECBDecrypter(block)
