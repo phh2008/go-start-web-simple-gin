@@ -63,6 +63,17 @@ func QueryPage[T any](db *gorm.DB, pageNo, pageSize int) (model.PageData[T], err
 	return QueryOrderPage[T](db, "", "", pageNo, pageSize)
 }
 
+func OrderPageScope[T any](page model.QueryPage, data *model.PageData[T]) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		pageNo := page.GetPageNo()
+		pageSize := page.GetPageSize()
+		data.PageNo = pageNo
+		data.PageSize = pageSize
+		offset := (pageNo - 1) * pageSize
+		return db.Scopes(OrderScope(page.Sort, page.Direction)).Offset(offset).Limit(pageSize)
+	}
+}
+
 // QueryOrderPage 排序分页查询
 func QueryOrderPage[T any](db *gorm.DB, sortField string, direct string, pageNo, pageSize int) (model.PageData[T], error) {
 	if pageNo <= 0 {

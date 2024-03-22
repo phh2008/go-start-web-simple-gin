@@ -17,6 +17,7 @@ require (
 	github.com/jinzhu/copier v0.3.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/shopspring/decimal v1.3.1
+	github.com/showa-93/go-mask v0.6.1
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.8.2
@@ -77,7 +78,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230126093431-47fa9a501578 // indirect
-	github.com/showa-93/go-mask v0.6.1 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

@@ -6,7 +6,7 @@ import (
 )
 
 var snakeReg = regexp.MustCompile("[A-Z][a-z]")
-var ColumnReg = regexp.MustCompile("^[A-Za-z0-9_]+|[A-Za-z0-9_]+\\.[A-Za-z0-9_]+$") //字母数字下划线
+var ColumnReg = regexp.MustCompile(`^([a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*)$|^([a-zA-Z_][a-zA-Z0-9_]*)$`) //字母数字下划线
 var DirectReg = regexp.MustCompile("^asc|desc|ASC|DESC$")
 
 const underline = "_"
