@@ -3,7 +3,6 @@ package rsa
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"unsafe"
 )
 
 type CodecResult struct {
@@ -21,7 +20,7 @@ func (a CodecResult) ToRawString() string {
 	if len(a.Raw) == 0 || a.Error != nil {
 		return ""
 	}
-	return bytes2string(a.Raw)
+	return string(a.Raw)
 }
 
 // ToHexString outputs as string with hex encoding.
@@ -49,33 +48,4 @@ func (a CodecResult) ToRawBytes() []byte {
 		return []byte("")
 	}
 	return a.Raw
-}
-
-func interface2bytes(i interface{}) (b []byte) {
-	switch v := i.(type) {
-	case string:
-		b = string2bytes(v)
-	case []byte:
-		b = v
-	}
-	return
-}
-
-func string2bytes(s string) []byte {
-	if len(s) == 0 {
-		return []byte("")
-	}
-	return *(*[]byte)(unsafe.Pointer(
-		&struct {
-			string
-			Cap int
-		}{s, len(s)},
-	))
-}
-
-func bytes2string(b []byte) string {
-	if len(b) == 0 {
-		return ""
-	}
-	return *(*string)(unsafe.Pointer(&b))
 }
