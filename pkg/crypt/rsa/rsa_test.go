@@ -9,7 +9,7 @@ import (
 
 func TestRsa_EncryptWithPublicKey(t *testing.T) {
 	input := []byte("hello world!!!")
-	pubKey, priKey := openssl.RSA.GenKeyPair(openssl.PKCS8, 2048)
+	pubKey, priKey, _ := openssl.RSA.GenKeyPair(openssl.PKCS8, 2048)
 	t.Log("公钥：\n", string(pubKey))
 	t.Log("私钥：\n", string(priKey))
 
@@ -24,7 +24,7 @@ func TestRsa_EncryptWithPublicKey(t *testing.T) {
 
 func TestRsa_EncryptWithPrivateKey(t *testing.T) {
 	input := []byte("hello world!!!")
-	pubKey, priKey := openssl.RSA.GenKeyPair(openssl.PKCS8, 2048)
+	pubKey, priKey, _ := openssl.RSA.GenKeyPair(openssl.PKCS8, 2048)
 	t.Log("公钥：\n", string(pubKey))
 	t.Log("私钥：\n", string(priKey))
 
@@ -39,7 +39,7 @@ func TestRsa_EncryptWithPrivateKey(t *testing.T) {
 
 func TestRsa_SignWithPrivateKy(t *testing.T) {
 	input := []byte("hello world!!!")
-	pubKey, priKey := openssl.RSA.GenKeyPair(openssl.PKCS8, 2048)
+	pubKey, priKey, _ := openssl.RSA.GenKeyPair(openssl.PKCS8, 2048)
 	t.Log("公钥：\n", string(pubKey))
 	t.Log("私钥：\n", string(priKey))
 

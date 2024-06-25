@@ -14,18 +14,18 @@ var (
 )
 
 func TestRsa_GenKeyPair(t *testing.T) {
-	publicKey1, privateKey1 = RSA.GenKeyPair(PKCS1, 1024)
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS1, 1024)
 	fmt.Printf("生成 1024 字节 PKCS#1 格式公钥：\n%s", publicKey1)
 	fmt.Printf("生成 1024 字节 PKCS#1 格式私钥：\n%s", privateKey1)
 
-	publicKey8, privateKey8 = RSA.GenKeyPair(PKCS8, 2048)
+	publicKey8, privateKey8, _ = RSA.GenKeyPair(PKCS8, 2048)
 	fmt.Printf("生成 2048 字节 PKCS#8 格式公钥：\n%s", publicKey8)
 	fmt.Printf("生成 2048 字节 PKCS#8 格式私钥：\n%s", privateKey8)
 }
 
 func TestRsa_VerifyKeyPair(t *testing.T) {
-	publicKey1, privateKey1 = RSA.GenKeyPair(PKCS1, 1024)
-	publicKey8, privateKey8 = RSA.GenKeyPair(PKCS8, 2048)
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS1, 1024)
+	publicKey8, privateKey8, _ = RSA.GenKeyPair(PKCS8, 2048)
 
 	assert.Equal(t, true, RSA.VerifyKeyPair(publicKey1, privateKey1))
 	assert.Equal(t, true, RSA.VerifyKeyPair(publicKey8, privateKey8))
@@ -36,8 +36,8 @@ func TestRsa_VerifyKeyPair(t *testing.T) {
 }
 
 func TestRsa_IsPublicKey(t *testing.T) {
-	publicKey1, privateKey1 = RSA.GenKeyPair(PKCS1, 1024)
-	publicKey8, privateKey8 = RSA.GenKeyPair(PKCS8, 2048)
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS1, 1024)
+	publicKey8, privateKey8, _ = RSA.GenKeyPair(PKCS8, 2048)
 
 	assert.Equal(t, true, RSA.IsPublicKey(publicKey1))
 	assert.Equal(t, true, RSA.IsPrivateKey(privateKey1))
@@ -54,8 +54,8 @@ func TestRsa_IsPublicKey(t *testing.T) {
 }
 
 func TestRsa_ParsePublicKey(t *testing.T) {
-	publicKey1, privateKey1 = RSA.GenKeyPair(PKCS1, 1024)
-	publicKey8, privateKey8 = RSA.GenKeyPair(PKCS8, 2048)
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS1, 1024)
+	publicKey8, privateKey8, _ = RSA.GenKeyPair(PKCS8, 2048)
 
 	pub1, err1 := RSA.ParsePublicKey(publicKey1)
 	assert.Nil(t, err1)
@@ -71,8 +71,8 @@ func TestRsa_ParsePublicKey(t *testing.T) {
 }
 
 func TestRsa_ExportPublicKey(t *testing.T) {
-	publicKey1, privateKey1 = RSA.GenKeyPair(PKCS1, 1024)
-	publicKey8, privateKey8 = RSA.GenKeyPair(PKCS8, 2048)
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS1, 1024)
+	publicKey8, privateKey8, _ = RSA.GenKeyPair(PKCS8, 2048)
 
 	actual1, err1 := RSA.ExportPublicKey(privateKey1)
 	assert.Nil(t, err1)

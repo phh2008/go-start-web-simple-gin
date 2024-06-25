@@ -42,9 +42,12 @@ func newRsaKeyPair() *rsaKeyPair {
 
 // GenKeyPair generates key pair.
 // 生成密钥对
-func (r rsaKeyPair) GenKeyPair(pkcs keyFormat, bits int) (publicKey, privateKey []byte) {
-	pri, _ := rsa.GenerateKey(rand.Reader, bits)
-
+func (r rsaKeyPair) GenKeyPair(pkcs keyFormat, bits int) (publicKey, privateKey []byte, err error) {
+	var pri *rsa.PrivateKey
+	pri, err = rsa.GenerateKey(rand.Reader, bits)
+	if err != nil {
+		return
+	}
 	if pkcs == PKCS1 {
 		privateBytes := x509.MarshalPKCS1PrivateKey(pri)
 		privateKey = pem.EncodeToMemory(&pem.Block{
@@ -81,7 +84,7 @@ func (r rsaKeyPair) VerifyKeyPair(publicKey, privateKey []byte) bool {
 	if err != nil {
 		return false
 	}
-	if bytes2string(publicKey) == bytes2string(pub) {
+	if string(publicKey) == string(pub) {
 		return true
 	}
 	return false
@@ -131,8 +134,8 @@ func (r rsaKeyPair) FormatPublicKey(pkcs keyFormat, publicKey []byte) []byte {
 		keyHeader = "-----BEGIN PUBLIC KEY-----\n"
 		keyTail = "-----END PUBLIC KEY-----\n"
 	}
-	keyBody := stringSplit(strings.Replace(bytes2string(publicKey), "\n", "", -1), 64)
-	return string2bytes(keyHeader + keyBody + keyTail)
+	keyBody := stringSplit(strings.Replace(string(publicKey), "\n", "", -1), 64)
+	return []byte(keyHeader + keyBody + keyTail)
 }
 
 // FormatPrivateKey formats private key, adds header, tail and newline character
@@ -147,8 +150,8 @@ func (r rsaKeyPair) FormatPrivateKey(pkcs keyFormat, privateKey []byte) []byte {
 		keyHeader = "-----BEGIN PRIVATE KEY-----\n"
 		keyTail = "-----END PRIVATE KEY-----\n"
 	}
-	keyBody := stringSplit(strings.Replace(bytes2string(privateKey), "\n", "", -1), 64)
-	return string2bytes(keyHeader + keyBody + keyTail)
+	keyBody := stringSplit(strings.Replace(string(privateKey), "\n", "", -1), 64)
+	return []byte(keyHeader + keyBody + keyTail)
 }
 
 // ParsePublicKey parses public key.
@@ -235,10 +238,10 @@ func (r rsaKeyPair) CompressKey(key []byte) ([]byte, error) {
 	if !r.IsPublicKey(key) && !r.IsPrivateKey(key) {
 		return nil, invalidRSAKeyError()
 	}
-	str := strings.Replace(bytes2string(key), "\n", "", -1)
+	str := strings.Replace(string(key), "\n", "", -1)
 	str = strings.Replace(str, "-----BEGIN RSA PUBLIC KEY-----", "", -1)
 	str = strings.Replace(str, "-----BEGIN PUBLIC KEY-----", "", -1)
 	str = strings.Replace(str, "-----END RSA PUBLIC KEY-----", "", -1)
 	str = strings.Replace(str, "-----END PUBLIC KEY-----", "", -1)
-	return string2bytes(str), nil
+	return []byte(str), nil
 }
