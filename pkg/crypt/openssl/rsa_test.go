@@ -82,3 +82,35 @@ func TestRsa_ExportPublicKey(t *testing.T) {
 	assert.Nil(t, err8)
 	assert.Equal(t, publicKey8, actual8)
 }
+
+func TestRsaFmtKey(t *testing.T) {
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS1, 1024)
+	pubKey, err := RSA.CompressKey(publicKey1)
+	assert.Nil(t, err)
+	t.Log("压缩后的pubKey:\n", string(pubKey))
+	priKey, err := RSA.CompressKey(privateKey1)
+	assert.Nil(t, err)
+	t.Log("压缩后的priKey:\n", string(priKey))
+
+	priKey = RSA.FormatPrivateKey(PKCS1, priKey)
+	t.Log("格式化后的priKey:\n", string(priKey))
+
+	pubKey = RSA.FormatPublicKey(PKCS1, pubKey)
+	t.Log("格式化后的priKey:\n", string(pubKey))
+}
+
+func TestRsaFmtKey2(t *testing.T) {
+	publicKey1, privateKey1, _ = RSA.GenKeyPair(PKCS8, 2048)
+	pubKey, err := RSA.CompressKey(publicKey1)
+	assert.Nil(t, err)
+	t.Log("压缩后的pubKey:\n", string(pubKey))
+	priKey, err := RSA.CompressKey(privateKey1)
+	assert.Nil(t, err)
+	t.Log("压缩后的priKey:\n", string(priKey))
+
+	priKey = RSA.FormatPrivateKey(PKCS8, priKey)
+	t.Log("格式化后的priKey:\n", string(priKey))
+
+	pubKey = RSA.FormatPublicKey(PKCS8, pubKey)
+	t.Log("格式化后的priKey:\n", string(pubKey))
+}

@@ -1,4 +1,3 @@
-// Package rsa implements crypto/rsa, fork from https://github.com/golang-module/dongle
 package rsa
 
 import (

@@ -1,4 +1,3 @@
-// Package openssl for key certificate management, fork from https://github.com/golang-module/dongle
 package openssl
 
 import (
